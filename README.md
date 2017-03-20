@@ -1,2 +1,2 @@
 # ising3d
-Simulation of 3d Ising Model
+Simulation of 3D Ising Model with null or periodic border conditions

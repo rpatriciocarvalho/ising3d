@@ -1,60 +1,60 @@
 /*
 
-	Descrição: Esta função encontra o vizinho em uma
-		       simulação do modelo de Ising em 2d.
+	DescriÃ§Ã£o: Esta funÃ§Ã£o encontra o vizinho em uma
+		       simulaÃ§Ã£o do modelo de Ising em 2d.
 	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-	Última modificação: 23/01/2017
+	Ãšltima modificaÃ§Ã£o: 23/01/2017
 
-	Observações:
+	ObservaÃ§Ãµes:
 */
 
 #include "funcoes_ising2d.h"
 
 int vizinho_periodico(int x, int y, int z, int posicao){
 
-	int eixo_x, eixo_y, eixo_z;
+    int eixo_x, eixo_y, eixo_z;
 
-	if (posicao == 1){
-		eixo_x = x + 1;
-		eixo_y = y;
+    if (posicao == 1){
+        eixo_x = x + 1;
+        eixo_y = y;
         eixo_z = z;
-		if (eixo_x == NX) eixo_x = 0;
-	}
+        if (eixo_x == NX) eixo_x = 0;
+    }
 
-	if (posicao == 2){
-		eixo_x = x;
-		eixo_y = y - 1;
+    if (posicao == 2){
+        eixo_x = x;
+        eixo_y = y - 1;
         eixo_z = z;
-		if (eixo_y == -1) eixo_y = (NY - 1);
-	}
+        if (eixo_y == -1) eixo_y = (NY - 1);
+    }
 
-	if (posicao == 3){
-		eixo_x = x - 1;
-		eixo_y = y;
+    if (posicao == 3){
+        eixo_x = x - 1;
+        eixo_y = y;
         eixo_z = z;
-		if (eixo_x == -1) eixo_x = (NX - 1);
-	}
+        if (eixo_x == -1) eixo_x = (NX - 1);
+    }
 
-	if (posicao == 4){
-		eixo_x = x;
-		eixo_y = y + 1;
+    if (posicao == 4){
+        eixo_x = x;
+        eixo_y = y + 1;
         eixo_z = z;
-		if (eixo_y == NY) eixo_y = 0;
-	}
-	
-	if (posicao == 5){
-		eixo_x = x;
-		eixo_y = y;
+        if (eixo_y == NY) eixo_y = 0;
+    }
+
+    if (posicao == 5){
+        eixo_x = x;
+        eixo_y = y;
         eixo_z = z - 1;
-		if (eixo_z == -1) eixo_z = (NZ - 1);
-	}
+        if (eixo_z == -1) eixo_z = (NZ - 1);
+    }
 
-	if (posicao == 6){
-		eixo_x = x;
-		eixo_y = y;
+    if (posicao == 6){
+        eixo_x = x;
+        eixo_y = y;
         eixo_z = z + 1;
-		if (eixo_z == NZ) eixo_z = 0;
-	}
+        if (eixo_z == NZ) eixo_z = 0;
+    }
 
-	return (rede[eixo_x][eixo_y][eixo_z]);
+    return (rede[eixo_x][eixo_y][eixo_z]);
 }

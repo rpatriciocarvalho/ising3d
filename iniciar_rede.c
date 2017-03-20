@@ -1,11 +1,11 @@
 /*
 
-	DescriÁ„o: Esta funÁ„o gera a rede inicial em uma
-		       simulaÁ„o do modelo de Ising em 2d.
+	Descri√ß√£o: Esta fun√ß√£o gera a rede inicial em uma
+		       simula√ß√£o do modelo de Ising em 2d.
 	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-	⁄ltima modificaÁ„o: 16/02/2016
+	√öltima modifica√ß√£o: 16/02/2016
 
-	ObservaÁıes:
+	Observa√ß√µes:
 */
 
 #include "funcoes_ising2d.h"
@@ -14,27 +14,27 @@ void iniciar_rede(){
 
     int x, y, z;
 
-	/*
-	Gera rede inicial. Se "PARTIDA" for nulo, ent„o È
-	iniciada como todos os sitios unit·rios. Se for
-	n„o nulo, ent„o È aleatÛria a rede inicial.
-	*/
+    /*
+    Gera rede inicial. Se "PARTIDA" for nulo, ent√£o √©
+    iniciada como todos os sitios unit√°rios. Se for
+    n√£o nulo, ent√£o √© aleat√≥ria a rede inicial.
+    */
 
-	if (PARTIDA == 0) {
-		for(x=0; x < NX; x++){
-			for(y=0; y < NY; y++){
-				for(z = 0; z < NZ; z++){
-					rede[x][y][z] = 1;
-				}
-			}
-		}
-	} else {
-		for(x=0; x < NX; x++){
-			for(y=0; y < NY; y++){
-				for(z = 0; z < NZ; z++){
-					rede[x][y][z] = aleatorio();
-				}
-			}
-		}
-	}
+    if (PARTIDA == 0) {
+        for(x=0; x < NX; x++){
+            for(y=0; y < NY; y++){
+                for(z = 0; z < NZ; z++){
+                        rede[x][y][z] = 1;
+                }
+            }
+        }
+    } else {
+        for(x=0; x < NX; x++){
+            for(y=0; y < NY; y++){
+                for(z = 0; z < NZ; z++){
+                        rede[x][y][z] = aleatorio();
+                }
+            }
+        }
+    }
 }

@@ -1,24 +1,24 @@
 /*
 
-	Descrição: Esta função gera um número aleatório com o RANMAR em uma
-		       simulação do modelo de Ising em 2d.
+	DescriÃ§Ã£o: Esta funÃ§Ã£o gera um nÃºmero aleatÃ³rio com o RANMAR em uma
+		   simulaÃ§Ã£o do modelo de Ising em 2d.
 	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-	Última modificação: 15/05/2016
+	Ãšltima modificaÃ§Ã£o: 15/05/2016
 
-	Observações:
+	ObservaÃ§Ãµes:
 */
 
 #include "funcoes_ising2d.h"
 
 int aleatorio(){
 
-	// Esta função gera um número aleatório 1 e -1
+    // Esta funÃ§Ã£o gera um nÃºmero aleatÃ³rio 1 e -1
 
-	if(ranmar() < 0.5){
-		return(1);
-	} else {
-		return(-1);
-	}
+    if(ranmar() < 0.5){
+        return(1);
+    } else {
+        return(-1);
+    }
 
 }
 

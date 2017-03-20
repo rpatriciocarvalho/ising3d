@@ -1,12 +1,12 @@
 /*
 
-	Descrição: Simulação do modelo de Ising em 3d.
+	Descriï¿½ï¿½o: Simulaï¿½ï¿½o do modelo de Ising em 3d.
 	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-	Última modificação: 23/01/2016
+	ï¿½ltima modificaï¿½ï¿½o: 23/01/2016
 
-	Observações: Os parâmetros da simulação devem se modificados
+	Observaï¿½ï¿½es: Os parï¿½metros da simulaï¿½ï¿½o devem se modificados
 				no arquivo 'funcoes_ising2d.h'
-				
+	14			
 				25/01/2017 - Adicionei o calculo do cumulante de Binder
 */
 
@@ -26,14 +26,14 @@ int main(){
     double cumulante;
 	char nome_arquivo[25];
 
-	// Iniciando o gerador de números aleatórios
+	// Iniciando o gerador de nï¿½meros aleatï¿½rios
     srand(time(NULL)); // Inicia semente
     rmarin((int) rand()%31328, (int) rand()%30081); //inicia o ranmar
 
 	/*
-	Se "TERMALIZACAO" for diferente de zero, então
-	gera o gráfico da energia por passos e não executa
-	a simulação.
+	Se "TERMALIZACAO" for diferente de zero, entï¿½o
+	gera o grï¿½fico da energia por passos e nï¿½o executa
+	a simulaï¿½ï¿½o.
 	*/
 
  	iniciar_rede(); // Gerando a rede inicial
@@ -55,8 +55,8 @@ int main(){
 	}
 
 	/*
-	Executa a simulação caso não tenhamos que
-	calcular a termalização.
+	Executa a simulaï¿½ï¿½o caso nï¿½o tenhamos que
+	calcular a termalizaï¿½ï¿½o.
 	*/
 
 	if (TERMALIZACAO == 0) {
@@ -72,7 +72,7 @@ int main(){
                 arquivo_dados = fopen(nome_arquivo, "w");
             }
 
-            passos_termalizacao = N_PASSOS*0.1; // Definindo 10% do número total de passos para termalizar.
+            passos_termalizacao = N_PASSOS*0.1; // Definindo 10% do nï¿½mero total de passos para termalizar.
             fator_normalizacao = (double) NX*NY*NZ*(N_PASSOS-passos_termalizacao+1.0);
 
             for(temperatura=TEMP_I;temperatura<=TEMP_F; temperatura+=INCRE_TEMP){
@@ -118,9 +118,9 @@ int main(){
 				}
 					
 				
-                // Será escrito no arquivo as seguintes colunas
-                // Temp. -  Mag. média - desvio mag.
-                // - energia média - desvio energia - calor espec?fico - suscetibilidade_mag - cumulante
+                // Serï¿½ escrito no arquivo as seguintes colunas
+                // Temp. -  Mag. mï¿½dia - desvio mag.
+                // - energia mï¿½dia - desvio energia - calor espec?fico - suscetibilidade_mag - cumulante
 
                 if (CLUSTER == 0){
                     printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, MEDIDAS, (float) (temperatura/TEMP_F)*100.0); // Porcentagem da simulacao

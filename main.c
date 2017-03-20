@@ -14,18 +14,20 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "funcoes_ising2d.h"
 
 int main(){
 
-    int i, passos_termalizacao, quantidade_medidas;
+    int i, passos_termalizacao, quantidade_medidas, diretorio;
     double magnetizacao, energia, temperatura, fator_normalizacao;
     double calor_especifico, suscetibilidade_mag, mag, ene;
     double magnetizacao_2, energia_2, magnetizacao_3, magnetizacao_4;
     double desvio_magnetizacao, desvio_quarto_magnetizacao, desvio_energia;
     double cumulante;
     char nome_arquivo[25];
-
+    
     // Iniciando o gerador de números aleatórios
     srand(time(NULL)); // Inicia semente
     rmarin((int) rand()%31328, (int) rand()%30081); //inicia o ranmar
@@ -62,12 +64,18 @@ int main(){
     if (TERMALIZACAO == 0) {
         for(quantidade_medidas = 1; quantidade_medidas <= MEDIDAS; quantidade_medidas++){
             FILE *arquivo_dados;
-
+            
+            // Cria uma pasta para armazenar os dados
+            int hora = time(NULL);
+            char nome_pasta[50];
+            sprintf(nome_pasta,"%d", hora);
+            diretorio = mkdir(nome_pasta, 0700);
+            
             if (CLUSTER == 0){
                 if(VIZINHO == 0) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
+                    sprintf(nome_arquivo,"%s/dados_%dx%dx%d_%d_[%d]_nulo.dat", nome_pasta, NX, NY, NZ, N_PASSOS, quantidade_medidas);
                 } else {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
+                    sprintf(nome_arquivo,"%s/dados_%dx%dx%d_%d_[%d]_periodico.dat", nome_pasta, NX, NY, NZ, N_PASSOS, quantidade_medidas);
                 }
                 arquivo_dados = fopen(nome_arquivo, "w");
             }

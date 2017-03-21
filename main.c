@@ -2,7 +2,7 @@
 
     Descrição: Simulação do modelo de Ising em 3d.
     Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-    Última modificação: 23/01/2016
+    Última modificação: 20/03/2017
 
     Observações: Os parâmetros da simulação devem se modificados
                  no arquivo 'funcoes_ising2d.h'

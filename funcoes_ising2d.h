@@ -9,7 +9,7 @@
 */
 
 // Parâmetros ---------------------------
-#define N_PASSOS            100000	// Número de passos de Monte Carlo
+#define N_PASSOS            1000000     // Número de passos de Monte Carlo
 #define NX                  8           // Dimensão x da rede
 #define NY                  8           // Dimensão y da rede
 #define NZ                  8           // Dimensão z da rede
@@ -21,7 +21,7 @@
 #define	PARTIDA             0           // Partida fria (=0) ou quente (!=0)
 #define TERMALIZACAO        0           // Verifica a termalização (!=0) ou não (=0)
 #define CLUSTER             0           // 1 => Simulação no cluster; 0 => Simulação no pc
-#define MEDIDAS             1           // Número de medidas que serão feitas
+#define MEDIDAS             3           // Número de medidas que serão feitas
 #define VIZINHO             1           // 0 = vizinho nulo; 1 = vizinho periodico
 
 double calcula_energia();

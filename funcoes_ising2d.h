@@ -10,9 +10,9 @@
 
 // Parâmetros ---------------------------
 #define N_PASSOS            10000	// Número de passos de Monte Carlo
-#define NX                  24           // Dimensão x da rede
-#define NY                  24           // Dimensão y da rede
-#define NZ                  24           // Dimensão z da rede
+#define NX                  4           // Dimensão x da rede
+#define NY                  4           // Dimensão y da rede
+#define NZ                  4           // Dimensão z da rede
 #define TEMP_I              1         // Temperatura inicial da rede
 #define TEMP_F              8          // Temperatura final da rede
 #define INCRE_TEMP          0.1         // Incremento da temperatura
@@ -22,7 +22,7 @@
 #define TERMALIZACAO        0           // Verifica a termalização (!=0) ou não (=0)
 #define CLUSTER             0           // 1 => Simulação no cluster; 0 => Simulação no pc
 #define MEDIDAS             1           // Número de medidas que serão feitas
-#define VIZINHO             2           // 0 = vizinho nulo; 1 = vizinho unitario
+#define VIZINHO             2           // 0 = vizinho nulo; 1 = vizinho unitario; > 1 = periodico
 
 double calcula_energia();
 double calcula_magnetizacao();

@@ -14,17 +14,15 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include "funcoes_ising2d.h"
 
 int main(){
 
-    int i, passos_termalizacao, quantidade_medidas, diretorio;
+    int i, passos_termalizacao, quantidade_medidas;
     double magnetizacao, energia, temperatura, fator_normalizacao;
     double calor_especifico, suscetibilidade_mag, mag, ene;
-    double magnetizacao_2, energia_2, magnetizacao_3, magnetizacao_4;
-    double desvio_magnetizacao, desvio_quarto_magnetizacao, desvio_energia;
+    double magnetizacao_2, energia_2, magnetizacao_4;
+    double desvio_magnetizacao, desvio_energia;
     double cumulante;
     char nome_arquivo[25];
     
@@ -47,10 +45,10 @@ int main(){
             FILE *fp = fopen("termalizacao.dat", "w");
 
             for(i=1; i <= N_PASSOS; i++){
-                    metropolis(1.8); // 1.8
-                    energia = calcula_energia()/fator_normalizacao;
-                    magnetizacao = calcula_magnetizacao()/fator_normalizacao;
-                    fprintf(fp, "%d %f %f\n", i, energia, magnetizacao);
+                metropolis(1.8); // 1.8
+                energia = calcula_energia()/fator_normalizacao;
+                magnetizacao = calcula_magnetizacao()/fator_normalizacao;
+                fprintf(fp, "%d %f %f\n", i, energia, magnetizacao);
             }
             fclose(fp);
         }
@@ -65,11 +63,7 @@ int main(){
         for(quantidade_medidas = 1; quantidade_medidas <= MEDIDAS; quantidade_medidas++){
             FILE *arquivo_dados;
             
-            // Cria uma pasta para armazenar os dados
             int hora = time(NULL);
-            //char nome_pasta[50];
-            //sprintf(nome_pasta,"%d", hora);
-            //diretorio = mkdir(nome_pasta, 0700);
             
             if (CLUSTER == 0){
                 if(VIZINHO == 0) {
@@ -88,7 +82,7 @@ int main(){
             for(temperatura=TEMP_I;temperatura<=TEMP_F; temperatura+=INCRE_TEMP){
 
                 magnetizacao = energia = 0.0;
-                magnetizacao_2 = magnetizacao_3 = magnetizacao_4 = energia_2 = 0.0;
+                magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
 
                 for(i=1; i<=N_PASSOS; i++){
 
@@ -100,7 +94,6 @@ int main(){
                         magnetizacao += mag;
                         energia += ene;
                         magnetizacao_2 += pow(mag, 2);
-                        magnetizacao_3 += pow(mag, 3);
                         magnetizacao_4 += pow(mag, 4);
                         energia_2 += pow(ene, 2);
                     }
@@ -109,17 +102,13 @@ int main(){
                 magnetizacao /= fator_normalizacao;
                 energia /= fator_normalizacao;
                 magnetizacao_2 /= fator_normalizacao*NX*NY*NZ;
-                magnetizacao_3 /= fator_normalizacao*pow(NX*NY*NZ, 2);
                 magnetizacao_4 /= fator_normalizacao*pow(NX*NY*NZ, 3);
                 energia_2 /= fator_normalizacao*NX*NY*NZ;
 
                 calor_especifico = (double) (NX*NY*NZ)*(energia_2 - pow(energia, 2))/(K_B*pow(temperatura, 2));
                 suscetibilidade_mag = (double) (NX*NY*NZ)*(magnetizacao_2 - pow(magnetizacao, 2))/(K_B*temperatura);
                 desvio_magnetizacao = (double) sqrt(magnetizacao_2 - pow(magnetizacao, 2));
-                desvio_quarto_magnetizacao = (double) magnetizacao_4 - 4*magnetizacao_3*magnetizacao +
-                                                6*magnetizacao_2*pow(magnetizacao, 2) - 3*pow(magnetizacao, 4);
                 desvio_energia = (double) sqrt(energia_2 - pow(energia, 2));
-                //cumulante = 1-(desvio_quarto_magnetizacao/(3*pow(magnetizacao_2 - pow(magnetizacao, 2), 2)));
                 cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
                 
                 // Será escrito no arquivo as seguintes colunas

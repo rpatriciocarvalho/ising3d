@@ -28,6 +28,13 @@ void metropolis(float temperatura){
                                     vizinho_nulo(x,y,z,4) +
                                     vizinho_nulo(x,y,z,5) +
                                     vizinho_nulo(x,y,z,6);
+                } else if (VIZINHO == 1) {
+                    soma_vizinhos = vizinho_unitario(x,y,z,1) +
+                                    vizinho_unitario(x,y,z,2) +
+                                    vizinho_unitario(x,y,z,3) +
+                                    vizinho_unitario(x,y,z,4) +
+                                    vizinho_unitario(x,y,z,5) +
+                                    vizinho_unitario(x,y,z,6);
                 } else {
                     soma_vizinhos = vizinho_periodico(x,y,z,1) +
                                     vizinho_periodico(x,y,z,2) +

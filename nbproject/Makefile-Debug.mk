@@ -42,7 +42,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/metropolis.o \
 	${OBJECTDIR}/vizinho_nulo.o \
-	${OBJECTDIR}/vizinho_periodico.o
+	${OBJECTDIR}/vizinho_periodico.o \
+	${OBJECTDIR}/vizinho_unitario.o
 
 
 # C Compiler Flags
@@ -108,6 +109,11 @@ ${OBJECTDIR}/vizinho_periodico.o: vizinho_periodico.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/vizinho_periodico.o vizinho_periodico.c
+
+${OBJECTDIR}/vizinho_unitario.o: vizinho_unitario.c
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/vizinho_unitario.o vizinho_unitario.c
 
 # Subprojects
 .build-subprojects:

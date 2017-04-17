@@ -67,15 +67,17 @@ int main(){
             
             // Cria uma pasta para armazenar os dados
             int hora = time(NULL);
-            char nome_pasta[50];
-            sprintf(nome_pasta,"%d", hora);
-            diretorio = mkdir(nome_pasta, 0700);
+            //char nome_pasta[50];
+            //sprintf(nome_pasta,"%d", hora);
+            //diretorio = mkdir(nome_pasta, 0700);
             
             if (CLUSTER == 0){
                 if(VIZINHO == 0) {
-                    sprintf(nome_arquivo,"%s/dados_%dx%dx%d_%d_[%d]_nulo.dat", nome_pasta, NX, NY, NZ, N_PASSOS, quantidade_medidas);
+                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
+                } else if (VIZINHO == 1) {
+                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_unitario.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
                 } else {
-                    sprintf(nome_arquivo,"%s/dados_%dx%dx%d_%d_[%d]_periodico.dat", nome_pasta, NX, NY, NZ, N_PASSOS, quantidade_medidas);
+                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
                 }
                 arquivo_dados = fopen(nome_arquivo, "w");
             }
@@ -117,15 +119,9 @@ int main(){
                 desvio_quarto_magnetizacao = (double) magnetizacao_4 - 4*magnetizacao_3*magnetizacao +
                                                 6*magnetizacao_2*pow(magnetizacao, 2) - 3*pow(magnetizacao, 4);
                 desvio_energia = (double) sqrt(energia_2 - pow(energia, 2));
-                cumulante = 1-(desvio_quarto_magnetizacao/(3*pow(magnetizacao_2 - pow(magnetizacao, 2), 2)));
-
-                if(temperatura >= 3.5 && temperatura <= 5.0){
-                    cumulante = cumulante;
-                } else {
-                    cumulante = 0;
-                }
-
-
+                //cumulante = 1-(desvio_quarto_magnetizacao/(3*pow(magnetizacao_2 - pow(magnetizacao, 2), 2)));
+                cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
+                
                 // Será escrito no arquivo as seguintes colunas
                 // Temp. -  Mag. média - desvio mag.
                 // - energia média - desvio energia - calor específico - suscetibilidade_mag - cumulante

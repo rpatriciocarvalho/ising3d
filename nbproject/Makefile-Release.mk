@@ -21,8 +21,8 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux
-CND_DLIB_EXT=so
+CND_PLATFORM=MinGW-Windows
+CND_DLIB_EXT=dll
 CND_CONF=Release
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -42,7 +42,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/metropolis.o \
 	${OBJECTDIR}/vizinho_nulo.o \
-	${OBJECTDIR}/vizinho_periodico.o
+	${OBJECTDIR}/vizinho_periodico.o \
+	${OBJECTDIR}/vizinho_unitario.o
 
 
 # C Compiler Flags
@@ -63,51 +64,56 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ising3d
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ising3d.exe
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ising3d: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ising3d.exe: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ising3d ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/aleatorio.o: aleatorio.c 
+${OBJECTDIR}/aleatorio.o: aleatorio.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/aleatorio.o aleatorio.c
 
-${OBJECTDIR}/calcula_energia.o: calcula_energia.c 
+${OBJECTDIR}/calcula_energia.o: calcula_energia.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/calcula_energia.o calcula_energia.c
 
-${OBJECTDIR}/calcula_magnetizacao.o: calcula_magnetizacao.c 
+${OBJECTDIR}/calcula_magnetizacao.o: calcula_magnetizacao.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/calcula_magnetizacao.o calcula_magnetizacao.c
 
-${OBJECTDIR}/iniciar_rede.o: iniciar_rede.c 
+${OBJECTDIR}/iniciar_rede.o: iniciar_rede.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/iniciar_rede.o iniciar_rede.c
 
-${OBJECTDIR}/main.o: main.c 
+${OBJECTDIR}/main.o: main.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
 
-${OBJECTDIR}/metropolis.o: metropolis.c 
+${OBJECTDIR}/metropolis.o: metropolis.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/metropolis.o metropolis.c
 
-${OBJECTDIR}/vizinho_nulo.o: vizinho_nulo.c 
+${OBJECTDIR}/vizinho_nulo.o: vizinho_nulo.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/vizinho_nulo.o vizinho_nulo.c
 
-${OBJECTDIR}/vizinho_periodico.o: vizinho_periodico.c 
+${OBJECTDIR}/vizinho_periodico.o: vizinho_periodico.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/vizinho_periodico.o vizinho_periodico.c
+
+${OBJECTDIR}/vizinho_unitario.o: vizinho_unitario.c
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/vizinho_unitario.o vizinho_unitario.c
 
 # Subprojects
 .build-subprojects:
@@ -115,7 +121,6 @@ ${OBJECTDIR}/vizinho_periodico.o: vizinho_periodico.c
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ising3d
 
 # Subprojects
 .clean-subprojects:

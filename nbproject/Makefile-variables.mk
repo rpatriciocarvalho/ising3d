@@ -15,13 +15,13 @@ CND_PACKAGE_DIR_Debug=dist/Debug/MinGW-Windows/package
 CND_PACKAGE_NAME_Debug=ising3d.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/MinGW-Windows/package/ising3d.tar
 # Release configuration
-CND_PLATFORM_Release=GNU-Linux
-CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
+CND_PLATFORM_Release=MinGW-Windows
+CND_ARTIFACT_DIR_Release=dist/Release/MinGW-Windows
 CND_ARTIFACT_NAME_Release=ising3d
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/ising3d
-CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
+CND_ARTIFACT_PATH_Release=dist/Release/MinGW-Windows/ising3d
+CND_PACKAGE_DIR_Release=dist/Release/MinGW-Windows/package
 CND_PACKAGE_NAME_Release=ising3d.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/ising3d.tar
+CND_PACKAGE_PATH_Release=dist/Release/MinGW-Windows/package/ising3d.tar
 #
 # include compiler specific variables
 #

@@ -21,6 +21,7 @@
       <itemPath>metropolis.c</itemPath>
       <itemPath>vizinho_nulo.c</itemPath>
       <itemPath>vizinho_periodico.c</itemPath>
+      <itemPath>vizinho_unitario.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -68,6 +69,8 @@
       </item>
       <item path="vizinho_periodico.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="vizinho_unitario.c" ex="false" tool="0" flavor2="0">
+      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
@@ -106,6 +109,8 @@
       <item path="vizinho_nulo.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="vizinho_periodico.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="vizinho_unitario.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

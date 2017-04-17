@@ -25,6 +25,10 @@ int main(){
     double desvio_magnetizacao, desvio_energia;
     double cumulante;
     char nome_arquivo[25];
+
+    time_t inicio, fim;
+
+    inicio = time(NULL);
     
     // Iniciando o gerador de números aleatórios
     srand(time(NULL)); // Inicia semente
@@ -63,15 +67,13 @@ int main(){
         for(quantidade_medidas = 1; quantidade_medidas <= MEDIDAS; quantidade_medidas++){
             FILE *arquivo_dados;
             
-            int hora = time(NULL);
-            
             if (CLUSTER == 0){
                 if(VIZINHO == 0) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
+                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
                 } else if (VIZINHO == 1) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_unitario.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
+                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_unitario.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
                 } else {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
+                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
                 }
                 arquivo_dados = fopen(nome_arquivo, "w");
             }
@@ -138,5 +140,8 @@ int main(){
         fclose(arquivo_dados);
         }
     }
+
+    fim = time(NULL);
+    printf("O tempo de execucao em segundos é %f\n", difftime(fim, inicio));
     return 0;
 }

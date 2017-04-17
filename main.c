@@ -7,7 +7,7 @@
     Observações: Os parâmetros da simulação devem se modificados
                  no arquivo 'funcoes_ising2d.h'
 
-                 25/01/2017 - Adicionei o calculo do cumulante de Binder
+                 25/01/2017 - Adicionei o calculo do cumulante de Binder2
 */
 
 #include <stdio.h>

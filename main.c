@@ -14,16 +14,18 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
+#include <mpi.h>
 #include "funcoes_ising2d.h"
 
-int main(){
+int main(int argc, char** argv){
 
-    int i, passos_termalizacao, quantidade_medidas;
+    int i, passos_termalizacao, quantidade_medidas, n_passos_mpi, inicio_node, fim_node;
     double magnetizacao, energia, temperatura, fator_normalizacao;
     double calor_especifico, suscetibilidade_mag, mag, ene;
     double magnetizacao_2, energia_2, magnetizacao_4;
     double desvio_magnetizacao, desvio_energia;
     double cumulante;
+    double magnetizacao_node, energia_node, magnetizacao_2_node, magnetizacao_4_node, energia_2_node;
     char nome_arquivo[25];
 
     time_t inicio, fim;
@@ -65,99 +67,118 @@ int main(){
 
     if (TERMALIZACAO == 0) {
         for(quantidade_medidas = 1; quantidade_medidas <= MEDIDAS; quantidade_medidas++){
-            FILE *arquivo_dados;
             
-<<<<<<< HEAD
-            // Cria uma pasta para armazenar os dados
-            int hora = time(NULL);
-            //char nome_pasta[50];
-            //sprintf(nome_pasta,"%d", hora);
-            //diretorio = mkdir(nome_pasta, 0700);
+            // Inclusão do MPI
+            int myrank, nprocs;
+
+            MPI_Init(&argc, &argv);
+            MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+            MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
             
-            if (CLUSTER == 0){
-                if(VIZINHO == 0) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
-                } else if (VIZINHO == 1) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_unitario.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
-                } else {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, hora, quantidade_medidas);
-=======
-            if (CLUSTER == 0){
-                if(VIZINHO == 0) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
-                } else if (VIZINHO == 1) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_unitario.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
-                } else {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
->>>>>>> f048c07673bb33bcd39ee3b86886322e3df95cc3
+            n_passos_mpi = N_PASSOS/nprocs;
+                 
+                passos_termalizacao = n_passos_mpi*0.1; // Definindo 10% do número total de passos para termalizar.
+                fator_normalizacao = (double) NX*NY*NZ*(n_passos_mpi-passos_termalizacao+1.0);
+
+                if(myrank == 0)
+                {
+                    inicio_node = 0;
+                    fim_node = n_passos_mpi;                    
                 }
-                arquivo_dados = fopen(nome_arquivo, "w");
-            }
 
-            passos_termalizacao = N_PASSOS*0.1; // Definindo 10% do número total de passos para termalizar.
-            fator_normalizacao = (double) NX*NY*NZ*(N_PASSOS-passos_termalizacao+1.0);
+                if(myrank == 1)
+                {
+                    inicio_node = n_passos_mpi + 1;
+                    fim_node = 2*n_passos_mpi;                    
+                }
 
+                //if(myrank == 0){    
+                FILE *arquivo_dados;
+                
+                if (CLUSTER == 0){
+                    if(VIZINHO == 0) {
+                        sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
+                    } else if (VIZINHO == 1) {
+                        sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_unitario.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
+                    } else {
+                        sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
+                    }
+                    arquivo_dados = fopen(nome_arquivo, "w");
+                }
+            //}
+            
             for(temperatura=TEMP_I;temperatura<=TEMP_F; temperatura+=INCRE_TEMP){
-
+                
+                iniciar_rede();
                 magnetizacao = energia = 0.0;
                 magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
+                magnetizacao_node = energia_node = magnetizacao_2_node = 0.0;
+                magnetizacao_4_node = energia_2_node = 0.0;
+                
+                
 
-                for(i=1; i<=N_PASSOS; i++){
-
+                for(i=inicio_node; i <= fim_node; i++){
+                    
                     metropolis(temperatura);
 
                      if (i >= passos_termalizacao){
                         mag = fabsf(calcula_magnetizacao());
                         ene = fabsf(calcula_energia());
-                        magnetizacao += mag;
-                        energia += ene;
-                        magnetizacao_2 += pow(mag, 2);
-                        magnetizacao_4 += pow(mag, 4);
-                        energia_2 += pow(ene, 2);
+                        magnetizacao_node += mag;
+                        energia_node += ene;
+                        magnetizacao_2_node += pow(mag, 2);
+                        magnetizacao_4_node += pow(mag, 4);
+                        energia_2_node += pow(ene, 2);
+
+                        MPI_Reduce(&magnetizacao_node, &magnetizacao, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+                        MPI_Reduce(&energia_node, &energia, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+                        MPI_Reduce(&magnetizacao_2_node, &magnetizacao_2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+                        MPI_Reduce(&magnetizacao_4_node, &magnetizacao_4, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+                        MPI_Reduce(&energia_2_node, &energia_2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
                     }
                 }
 
-                magnetizacao /= fator_normalizacao;
-                energia /= fator_normalizacao;
-                magnetizacao_2 /= fator_normalizacao*NX*NY*NZ;
-                magnetizacao_4 /= fator_normalizacao*pow(NX*NY*NZ, 3);
-                energia_2 /= fator_normalizacao*NX*NY*NZ;
+                if (myrank == 0) {
+                    magnetizacao /= fator_normalizacao;
+                    energia /= fator_normalizacao;
+                    magnetizacao_2 /= fator_normalizacao*NX*NY*NZ;
+                    magnetizacao_4 /= fator_normalizacao*pow(NX*NY*NZ, 3);
+                    energia_2 /= fator_normalizacao*NX*NY*NZ;
 
-                calor_especifico = (double) (NX*NY*NZ)*(energia_2 - pow(energia, 2))/(K_B*pow(temperatura, 2));
-                suscetibilidade_mag = (double) (NX*NY*NZ)*(magnetizacao_2 - pow(magnetizacao, 2))/(K_B*temperatura);
-                desvio_magnetizacao = (double) sqrt(magnetizacao_2 - pow(magnetizacao, 2));
-                desvio_energia = (double) sqrt(energia_2 - pow(energia, 2));
-<<<<<<< HEAD
-                //cumulante = 1-(desvio_quarto_magnetizacao/(3*pow(magnetizacao_2 - pow(magnetizacao, 2), 2)));
-=======
->>>>>>> f048c07673bb33bcd39ee3b86886322e3df95cc3
-                cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
-                
-                // Será escrito no arquivo as seguintes colunas
-                // Temp. -  Mag. média - desvio mag.
-                // - energia média - desvio energia - calor específico - suscetibilidade_mag - cumulante
+                    calor_especifico = (double) (NX*NY*NZ)*(energia_2 - pow(energia, 2))/(K_B*pow(temperatura, 2));
+                    suscetibilidade_mag = (double) (NX*NY*NZ)*(magnetizacao_2 - pow(magnetizacao, 2))/(K_B*temperatura);
+                    desvio_magnetizacao = (double) sqrt(magnetizacao_2 - pow(magnetizacao, 2));
+                    desvio_energia = (double) sqrt(energia_2 - pow(energia, 2));
+                    cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
+                    
+                    // Será escrito no arquivo as seguintes colunas
+                    // Temp. -  Mag. média - desvio mag.
+                    // - energia média - desvio energia - calor específico - suscetibilidade_mag - cumulante
 
-                if (CLUSTER == 0){
-                    printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, MEDIDAS, (float) (temperatura/TEMP_F)*100.0); // Porcentagem da simulacao
-                    fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
-                                        magnetizacao,
-                                        desvio_magnetizacao,
-                                        energia,
-                                        desvio_energia,
-                                        calor_especifico,
-                                        suscetibilidade_mag,
-                                        cumulante);
-                } else {
-                    printf("%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
-                                magnetizacao,
-                                desvio_magnetizacao,
-                                energia,
-                                desvio_energia,
-                                calor_especifico,
-                                suscetibilidade_mag);
+                    if (CLUSTER == 0){
+                        printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, MEDIDAS, (float) (temperatura/TEMP_F)*100.0); // Porcentagem da simulacao
+                        fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
+                                            magnetizacao,
+                                            desvio_magnetizacao,
+                                            energia,
+                                            desvio_energia,
+                                            calor_especifico,
+                                            suscetibilidade_mag,
+                                            cumulante);
+                    } else {
+                        printf("%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
+                                    magnetizacao,
+                                    desvio_magnetizacao,
+                                    energia,
+                                    desvio_energia,
+                                    calor_especifico,
+                                    suscetibilidade_mag);
+                    }
                 }
+                
             }
-        fclose(arquivo_dados);
+        if(myrank == 0) fclose(arquivo_dados);
+        MPI_Finalize();
         }
     }
 

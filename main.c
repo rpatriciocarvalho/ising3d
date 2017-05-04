@@ -182,7 +182,7 @@ int main(int argc, char** argv){
                     }
                 }                
             }
-        fclose(arquivo_dados); // Fechamos o arquivo
+        if(CLUSTER == 0 && myrank == 0) fclose(arquivo_dados); // Fechamos o arquivo
         MPI_Finalize(); // Finalizamos o MPI
         }
     }

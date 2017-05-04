@@ -10,9 +10,9 @@
 
 // Parâmetros ---------------------------
 #define N_PASSOS            10000	// Número de passos de Monte Carlo
-#define NX                  8           // Dimensão x da rede
-#define NY                  8           // Dimensão y da rede
-#define NZ                  8           // Dimensão z da rede
+#define NX                  4           // Dimensão x da rede
+#define NY                  30           // Dimensão y da rede
+#define NZ                  30           // Dimensão z da rede
 #define TEMP_I              1         // Temperatura inicial da rede
 #define TEMP_F              8          // Temperatura final da rede
 #define INCRE_TEMP          0.1         // Incremento da temperatura

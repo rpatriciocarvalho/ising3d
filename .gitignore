@@ -1,3 +1,4 @@
 ising
 ising.exe
 *.dat
+noMPI/*.exe

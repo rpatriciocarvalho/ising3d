@@ -2,12 +2,10 @@
 
     Descrição: Simulação do modelo de Ising em 3d.
     Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-    Última modificação: 20/03/2017
 
     Observações: Os parâmetros da simulação devem se modificados
                  no arquivo 'funcoes_ising2d.h'
 
-                 25/01/2017 - Adicionei o calculo do cumulante de Binder
 */
 
 #include <stdio.h>
@@ -71,8 +69,6 @@ int main(int argc, char** argv){
                 if (CLUSTER == 0){
                     if(VIZINHO == 0) {
                         sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
-                    } else if (VIZINHO == 1) {
-                        sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_unitario.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
                     } else {
                         sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
                     }

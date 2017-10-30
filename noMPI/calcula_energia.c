@@ -25,21 +25,14 @@ double calcula_energia(){
     for(x = 0; x < NX; x++){
         for(y = 0; y < NY; y++){
             for(z = 0; z < NZ; z++){
-                if(VIZINHO == 0) {
-                    energia += rede[x][y][z]*(vizinho_nulo(x,y,z,1) +
-                                vizinho_nulo(x,y,z,2) +
-                                vizinho_nulo(x,y,z,3) +
-                                vizinho_nulo(x,y,z,4) +
-                                vizinho_nulo(x,y,z,5) +
-                                vizinho_nulo(x,y,z,6));
-                } else {
-                    energia += rede[x][y][z]*(vizinho_periodico(x,y,z,1) +
-                                vizinho_periodico(x,y,z,2) +
-                                vizinho_periodico(x,y,z,3) +
-                                vizinho_periodico(x,y,z,4) +
-                                vizinho_periodico(x,y,z,5) +
-                                vizinho_periodico(x,y,z,6));
-                }
+                
+                    energia += rede[x][y][z]*(vizinho(x,y,z,1, VIZINHO_X) +
+                        vizinho(x,y,z,2, VIZINHO_Y) +
+                        vizinho(x,y,z,3, VIZINHO_X) +
+                        vizinho(x,y,z,4, VIZINHO_Y) +
+                        vizinho(x,y,z,5, VIZINHO_Z) +
+                        vizinho(x,y,z,6, VIZINHO_Z));
+
             }
         }
     }

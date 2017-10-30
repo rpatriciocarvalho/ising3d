@@ -1,11 +1,9 @@
 /*
 
 	Descrição: Esta função gera a rede inicial em uma
-		       simulação do modelo de Ising em 2d.
+		       simulação do modelo de Ising.
 	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-	Última modificação: 16/02/2016
 
-	Observações:
 */
 
 #include "funcoes_ising2d.h"

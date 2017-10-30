@@ -3,9 +3,7 @@
 	Descriçãoo: Este cabeçalho possui os protótipos de funções da
 		       simulação do modelo de Ising em 2d.
 	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-	Última modificação: 23/01/2017
 
-	Observações:
 */
 
 // Parâmetros ---------------------------

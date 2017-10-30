@@ -4,7 +4,6 @@
 		       simulação do modelo de Ising em 3d.
 	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
 
-	Observações:
 */
 
 #include "funcoes_ising2d.h"

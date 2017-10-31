@@ -1,4 +1,6 @@
 ising
+.vscode
 ising.exe
 *.dat
 noMPI/*.exe
+*.k

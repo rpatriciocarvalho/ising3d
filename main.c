@@ -1,10 +1,11 @@
 /*
+
     Descrição: Simulação do modelo de Ising em 3d.
     Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-    Última modificação: 20/03/2017
+
     Observações: Os parâmetros da simulação devem se modificados
                  no arquivo 'funcoes_ising2d.h'
-                 25/01/2017 - Adicionei o calculo do cumulante de Binder
+
 */
 
 #include <stdio.h>
@@ -17,45 +18,33 @@
 int main(int argc, char** argv){
 
     int i, passos_termalizacao, quantidade_medidas;
-    int n_passos_mpi, inicio_node, fim_node, fator_normalizacao;
-    double magnetizacao, energia, temperatura;
+    double magnetizacao, energia, temperatura, fator_normalizacao;
     double calor_especifico, suscetibilidade_mag, mag, ene;
     double magnetizacao_2, energia_2, magnetizacao_4;
-    double desvio_magnetizacao, desvio_energia, cumulante;
-    double magnetizacao_node, energia_node, magnetizacao_2_node;
-    double magnetizacao_4_node, energia_2_node;
+    double desvio_magnetizacao, desvio_energia;
+    double cumulante;
     char nome_arquivo[25];
 
-    time_t inicio, fim; // Variáveis referentes à duração da simulação
-    inicio = time(NULL); // Marcamos a hora do início.
+    time_t inicio, fim; // Variáveis para marcar o tempo de execução
     
+    inicio = time(NULL); // Início da execução da aplicação
+        
     // Iniciando o gerador de números aleatórios
     srand(time(NULL)); // Inicia semente
     rmarin((int) rand()%31328, (int) rand()%30081); //inicia o ranmar
 
-    /*
+   /*
     Se "TERMALIZACAO" for diferente de zero, então
     gera o gráfico da energia por passos e não executa
     a simulação.
+
+    Apenas calcula a termalização se não for em um cluster.
     */
-
-    iniciar_rede(); // Gerando a rede inicial
-
-    if (CLUSTER == 0){
-        if (TERMALIZACAO != 0){
-
-            fator_normalizacao = (double) NX*NY*NZ;
-            FILE *fp = fopen("termalizacao.dat", "w");
-
-            for(i=1; i <= N_PASSOS; i++){
-                metropolis(1.8); // O termo da função é a temperatura na qual deseja-se avaliar a termalização
-                energia = calcula_energia()/fator_normalizacao;
-                magnetizacao = calcula_magnetizacao()/fator_normalizacao;
-                fprintf(fp, "%d %f %f\n", i, energia, magnetizacao);
-            }
-            fclose(fp);
-        }
-    }
+    
+    if (TERMALIZACAO != 0 && CLUSTER == 0){
+        iniciar_rede(); // Gerando a rede inicial
+        calcula_termalizacao();
+    } 
 
     /*
     Executa a simulação caso não tenhamos que
@@ -90,13 +79,8 @@ int main(int argc, char** argv){
             FILE *arquivo_dados;
             
             if (CLUSTER == 0){
-                if(VIZINHO == 0) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_nulo.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
-                } else if (VIZINHO == 1) {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_unitario.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
-                } else {
-                    sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_periodico.dat", NX, NY, NZ, N_PASSOS, quantidade_medidas);
-                }
+                sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
+                    quantidade_medidas, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
 
                 if(myrank == 0) arquivo_dados = fopen(nome_arquivo, "w"); // O arquivo é criado apenas no master
             }
@@ -145,15 +129,22 @@ int main(int argc, char** argv){
                     magnetizacao_4 /= (double) fator_normalizacao*pow(NX*NY*NZ, 3);
                     energia_2 /= (double) fator_normalizacao*NX*NY*NZ;
                     
+                    // Calculamos outras grandezas
                     calor_especifico = (double) (NX*NY*NZ)*(energia_2 - pow(energia, 2))/(K_B*pow(temperatura, 2));
                     suscetibilidade_mag = (double) (NX*NY*NZ)*(magnetizacao_2 - pow(magnetizacao, 2))/(K_B*temperatura);
                     desvio_magnetizacao = (double) sqrt(magnetizacao_2 - pow(magnetizacao, 2));
                     desvio_energia = (double) sqrt(energia_2 - pow(energia, 2));
                     cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
                     
-                    // Será escrito no arquivo as seguintes colunas
-                    // Temp. -  Mag. média - desvio mag.
-                    // - energia média - desvio energia - calor específico - suscetibilidade_mag - cumulante
+                    /*              
+                        Se a simulação não estiver rodando em um cluster, escrevemos os dados em um arquivo.
+                        Caso contrário escrevemos na tela.
+
+                        Será escrito no arquivo as seguintes colunas:
+                            Temperatura -  Magnetização média - desvio magnetização.
+                            energia média - desvio energia - calor específico 
+                            suscetibilidade magnética - cumulante de Binder
+                    */
 
                     if (CLUSTER == 0){
                         printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, MEDIDAS, (float) (temperatura/TEMP_F)*100.0); // Porcentagem da simulacao

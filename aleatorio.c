@@ -1,11 +1,8 @@
 /*
 
 	Descrição: Esta função gera um número aleatório com o RANMAR em uma
-		   simulação do modelo de Ising em 2d.
-	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-	Última modificação: 15/05/2016
-
-	Observações:
+           simulação do modelo de Ising.
+    Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
 */
 
 #include "funcoes_ising2d.h"

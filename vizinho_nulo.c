@@ -1,11 +1,9 @@
 /*
 
 	Descrição: Esta função encontra o vizinho em uma
-		       simulação do modelo de Ising em 2d.
+		       simulação do modelo de Ising.
 	Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
-	Última modificação: 2/11/2014
 
-	Observações:
 */
 
 #include "funcoes_ising2d.h"

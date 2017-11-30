@@ -25,6 +25,11 @@ int main(int argc, char** argv){
     double cumulante;
     char nome_arquivo[25];
 
+    // Variáveis para computação paralela
+    int n_passos_mpi, inicio_node, fim_node;
+    double magnetizacao_node, energia_node, magnetizacao_2_node;
+    double magnetizacao_4_node, energia_2_node;
+
     time_t inicio, fim; // Variáveis para marcar o tempo de execução
     
     inicio = time(NULL); // Início da execução da aplicação

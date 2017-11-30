@@ -17,7 +17,7 @@
 
 int main(int argc, char** argv){
 
-    int i, passos_termalizacao, quantidade_medidas;
+    unsigned long int i, passos_termalizacao, quantidade_medidas;
     double magnetizacao, energia, temperatura, fator_normalizacao;
     double calor_especifico, suscetibilidade_mag, mag, ene;
     double magnetizacao_2, energia_2, magnetizacao_4;
@@ -26,7 +26,8 @@ int main(int argc, char** argv){
     char nome_arquivo[25];
 
     // Variáveis para computação paralela
-    int n_passos_mpi, inicio_node, fim_node;
+    unsigned long int n_passos_mpi;
+    unsigned long int inicio_node, fim_node;
     double magnetizacao_node, energia_node, magnetizacao_2_node;
     double magnetizacao_4_node, energia_2_node;
 

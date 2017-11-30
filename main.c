@@ -79,13 +79,13 @@ int main(int argc, char** argv){
             }
 
             // Fator de normalização que será usado nas médias
-            fator_normalizacao = (int) (N_PASSOS - N_PASSOS*0.1)*NX*NY*NZ;
+            fator_normalizacao = (unsigned long int) (N_PASSOS - N_PASSOS*0.1)*NX*NY*NZ;
 
             // Cria um arquivo para armazenar os dados    
             FILE *arquivo_dados;
             
             if (CLUSTER == 0){
-                sprintf(nome_arquivo,"dados_%dx%dx%d_%d_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
+                sprintf(nome_arquivo,"dados_%dx%dx%d_%u_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
                     quantidade_medidas, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
 
                 if(myrank == 0) arquivo_dados = fopen(nome_arquivo, "w"); // O arquivo é criado apenas no master
@@ -153,7 +153,7 @@ int main(int argc, char** argv){
                     */
 
                     if (CLUSTER == 0){
-                        printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, MEDIDAS, (float) (temperatura/TEMP_F)*100.0); // Porcentagem da simulacao
+                        printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, (int) MEDIDAS, (float) (temperatura/TEMP_F)*100.0); // Porcentagem da simulacao
                         fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
                                             magnetizacao,
                                             desvio_magnetizacao,

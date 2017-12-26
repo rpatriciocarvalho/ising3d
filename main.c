@@ -27,7 +27,7 @@ int main(int argc, char** argv){
 
     // Variáveis para computação paralela
     double m_temp_mpi;
-    double inicio_node, fim_node; temperatura_node;
+    double inicio_node, fim_node, temperatura_node;
     double magnetizacao_node, energia_node, magnetizacao_2_node;
     double magnetizacao_4_node, energia_2_node;
 
@@ -67,7 +67,7 @@ int main(int argc, char** argv){
             MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
             MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
             
-            m_temp_mpi = (unsigned double) TEMP_F/nprocs; // Divide os passos de Monte Carlo unidade de processamento
+            m_temp_mpi = (double) TEMP_F/nprocs; // Divide os passos de Monte Carlo unidade de processamento
 
             // Estabelece os passos iniciais e finais para cada unidade de processamento
             for(i=0; i<nprocs; i++){

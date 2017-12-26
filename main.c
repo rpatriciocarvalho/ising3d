@@ -91,6 +91,7 @@ int main(int argc, char** argv){
                 if(myrank == 0) {
                     arquivo_dados = fopen(nome_arquivo, "w"); // O arquivo é criado apenas no master
                     temperatura = 0;
+                }
             }
             
             // É calculado as medidas para cada temperatura

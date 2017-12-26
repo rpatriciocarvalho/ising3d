@@ -4,3 +4,4 @@ ising.exe
 *.dat
 noMPI/*.exe
 *.k
+testempi.k

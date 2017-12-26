@@ -26,8 +26,8 @@ int main(int argc, char** argv){
     char nome_arquivo[25];
 
     // Variáveis para computação paralela
-    unsigned long int n_passos_mpi;
-    unsigned long int inicio_node, fim_node;
+    double m_temp_mpi;
+    double inicio_node, fim_node; temperatura_node;
     double magnetizacao_node, energia_node, magnetizacao_2_node;
     double magnetizacao_4_node, energia_2_node;
 
@@ -67,14 +67,14 @@ int main(int argc, char** argv){
             MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
             MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
             
-            n_passos_mpi = N_PASSOS/nprocs; // Divide os passos de Monte Carlo unidade de processamento
+            m_temp_mpi = (unsigned double) TEMP_F/nprocs; // Divide os passos de Monte Carlo unidade de processamento
 
             // Estabelece os passos iniciais e finais para cada unidade de processamento
             for(i=0; i<nprocs; i++){
                 if(myrank == i){
-                        inicio_node = i*n_passos_mpi + 1;
-                        fim_node = (i+1)*n_passos_mpi;
-                        passos_termalizacao = i*n_passos_mpi + n_passos_mpi*0.1;                    
+                        inicio_node = i*m_temp_mpi;
+                        if(inicio_node == 0) inicio_node = INCRE_TEMP;
+                        fim_node = i*m_temp_mpi + m_temp_mpi;                    
                 }
             }
 
@@ -88,11 +88,13 @@ int main(int argc, char** argv){
                 sprintf(nome_arquivo,"dados_%dx%dx%d_%u_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
                     quantidade_medidas, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
 
-                if(myrank == 0) arquivo_dados = fopen(nome_arquivo, "w"); // O arquivo é criado apenas no master
+                if(myrank == 0) {
+                    arquivo_dados = fopen(nome_arquivo, "w"); // O arquivo é criado apenas no master
+                    temperatura = 0;
             }
             
             // É calculado as medidas para cada temperatura
-            for(temperatura=TEMP_I;temperatura<=TEMP_F; temperatura+=INCRE_TEMP){
+            for(temperatura_node=inicio_node;temperatura_node<=fim_node; temperatura_node+=INCRE_TEMP){
                 
                 iniciar_rede(); 
                 // Zerando variáveis
@@ -102,7 +104,7 @@ int main(int argc, char** argv){
                 magnetizacao_4_node = energia_2_node = 0.0;
                 
                 // Para cada unidade de processamento uma quantidade de passos de Monte Carlo
-                for(i=inicio_node; i <= fim_node; i++){
+                for(i=1; i <= N_PASSOS; i++){
                     
                     metropolis(temperatura); // Algoritmo de Metropolis
                     
@@ -118,11 +120,13 @@ int main(int argc, char** argv){
                         energia_2_node += pow(ene, 2);
                         
                         // Envia os dados de cada unidade de processamento para a unidade de processamento primária
-                        MPI_Reduce(&magnetizacao_node, &magnetizacao, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-                        MPI_Reduce(&energia_node, &energia, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-                        MPI_Reduce(&magnetizacao_2_node, &magnetizacao_2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-                        MPI_Reduce(&magnetizacao_4_node, &magnetizacao_4, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-                        MPI_Reduce(&energia_2_node, &energia_2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+                        MPI_Gather(&temperatura_node, 1, MPI_DOUBLE, &temperatura, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                        MPI_Gather(&magnetizacao_node, 1, MPI_DOUBLE, &magnetizacao, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                        MPI_Gather(&energia_node, 1, MPI_DOUBLE, &energia, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                        MPI_Gather(&magnetizacao_2_node, 1, MPI_DOUBLE, &magnetizacao_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                        MPI_Gather(&magnetizacao_4_node, 1, MPI_DOUBLE, &magnetizacao_4, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                        MPI_Gather(&energia_2_node, 1, MPI_DOUBLE, &energia_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
                     }                    
                 }
 

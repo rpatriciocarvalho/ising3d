@@ -1,5 +1,6 @@
 #include "funcoes_ising2d.h"
 #include <stdio.h>
+#include <math.h>
 
 void calcula_termalizacao(){
     
@@ -11,8 +12,8 @@ void calcula_termalizacao(){
 
     for(i=1; i <= N_PASSOS; i++){
         metropolis(1.8); // Temperatura 1.8
-        energia = calcula_energia()/fator_normalizacao;
-        magnetizacao = calcula_magnetizacao()/fator_normalizacao;
+        energia = fabsf(calcula_energia()/fator_normalizacao);
+        magnetizacao = fabsf(calcula_magnetizacao()/fator_normalizacao);
         fprintf(fp, "%d %f %f\n", i, energia, magnetizacao);
     }
     fclose(fp);

@@ -67,17 +67,24 @@ int main(int argc, char** argv){
             MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
             MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
             
-            m_temp_mpi = (double) TEMP_F/nprocs; // Divide os passos de Monte Carlo unidade de processamento
+            m_temp_mpi = (double) TEMP_F/(nprocs - 1); // Divide os passos de Monte Carlo unidade de processamento
 
             // Estabelece os passos iniciais e finais para cada unidade de processamento
-            for(i=0; i<nprocs; i++){
+            for(i=1; i<nprocs; i++){
                 if(myrank == i){
+                    if (myrank == 1){ 
+                        inicio_node = INCRE_TEMP;
+                        fim_node = m_temp_mpi;
+                    } else {
                         inicio_node = i*m_temp_mpi;
-                        if(inicio_node == 0) inicio_node = INCRE_TEMP;
-                        fim_node = i*m_temp_mpi + m_temp_mpi;                    
+                        fim_node = inicio_node + m_temp_mpi;
+                    }                    
                 }
             }
 
+            // Definindo 10% do número total de passos para termalizar.
+            passos_termalizacao = N_PASSOS*0.1;
+            
             // Fator de normalização que será usado nas médias
             fator_normalizacao = (unsigned long int) (N_PASSOS - N_PASSOS*0.1)*NX*NY*NZ;
 
@@ -94,8 +101,9 @@ int main(int argc, char** argv){
                 }
             }
             
-            // É calculado as medidas para cada temperatura
-            for(temperatura_node=inicio_node;temperatura_node<=fim_node; temperatura_node+=INCRE_TEMP){
+            if(myrank != 0) {
+                // É calculado as medidas para cada temperatura
+                for(temperatura_node=inicio_node;temperatura_node<=fim_node; temperatura_node+=INCRE_TEMP){
                 
                 iniciar_rede(); 
                 // Zerando variáveis
@@ -104,10 +112,10 @@ int main(int argc, char** argv){
                 magnetizacao_node = energia_node = magnetizacao_2_node = 0.0;
                 magnetizacao_4_node = energia_2_node = 0.0;
                 
-                // Para cada unidade de processamento uma quantidade de passos de Monte Carlo
+                // Para cada unidade de processamento os passos de Monte Carlo
                 for(i=1; i <= N_PASSOS; i++){
                     
-                    metropolis(temperatura); // Algoritmo de Metropolis
+                    metropolis(temperatura_node); // Algoritmo de Metropolis
                     
                     // Começa a medir apenas depois da termalização
                     if (i > passos_termalizacao){
@@ -130,9 +138,9 @@ int main(int argc, char** argv){
                         MPI_Gather(&energia_2_node, 1, MPI_DOUBLE, &energia_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
                     }                    
                 }
-
+            }
                 // Se o processo estiver rodando na unidade de processamento primária, calcula-se as médias
-                if (myrank == 0) {
+            if (myrank == 0) {
                     
                     magnetizacao /= (double) fator_normalizacao;
                     energia /= (double) fator_normalizacao;
@@ -158,7 +166,7 @@ int main(int argc, char** argv){
                     */
 
                     if (CLUSTER == 0){
-                        printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, (int) MEDIDAS, (float) (temperatura/TEMP_F)*100.0); // Porcentagem da simulacao
+                        printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, (int) MEDIDAS, (float) temperatura); // Porcentagem da simulacao
                         fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
                                             magnetizacao,
                                             desvio_magnetizacao,

@@ -24,7 +24,7 @@
 #define VIZINHO_X           1           // 0 = vizinho nulo;  > 1 = periodico
 #define VIZINHO_Y			1
 #define VIZINHO_Z			1
-
+#define M_E					2.7182818284590452354
 double calcula_energia();
 double calcula_magnetizacao();
 void calcula_termalizacao();

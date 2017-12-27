@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include "funcoes_ising2d.h"
+#include "main.h"
 
 int main(int argc, char** argv){
 
@@ -31,8 +32,9 @@ int main(int argc, char** argv){
     double magnetizacao_node, energia_node, magnetizacao_2_node;
     double magnetizacao_4_node, energia_2_node;
 
-    time_t inicio, fim; // Variáveis para marcar o tempo de execução
-    
+    time_t inicio; // Variáveis para marcar o tempo de execução
+	time_t fim;
+
     inicio = time(NULL); // Início da execução da aplicação
         
     // Iniciando o gerador de números aleatórios

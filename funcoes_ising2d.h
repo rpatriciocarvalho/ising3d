@@ -19,7 +19,6 @@
 #define K_B                 1           // Constate de Boltzmann
 #define	PARTIDA             1           // Partida fria (=0) ou quente (!=0)
 #define TERMALIZACAO        0           // Verifica a termalização (!=0) ou não (=0)
-#define CLUSTER             0           // 1 => Simulação no cluster; 0 => Simulação no pc
 #define MEDIDAS             1           // Número de medidas que serão feitas
 #define VIZINHO_X           1           // 0 = vizinho nulo;  > 1 = periodico
 #define VIZINHO_Y			1

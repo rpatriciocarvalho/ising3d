@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include "funcoes_ising2d.h"
-#include "main.h"
 
 int main(int argc, char** argv){
 
@@ -46,10 +45,10 @@ int main(int argc, char** argv){
     gera o gráfico da energia por passos e não executa
     a simulação.
 
-    Apenas calcula a termalização se não for em um cluster.
+    Apenas calcula a termalização.
     */
     
-    if (TERMALIZACAO != 0 && CLUSTER == 0){
+    if (TERMALIZACAO != 0){
         iniciar_rede(); // Gerando a rede inicial
         calcula_termalizacao();
     } 
@@ -69,9 +68,9 @@ int main(int argc, char** argv){
             MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
             MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
             
-            m_temp_mpi = (double) TEMP_F/(nprocs - 1); // Divide os passos de Monte Carlo unidade de processamento
+            m_temp_mpi = (double) TEMP_F/(nprocs - 1); // Divide a temperatura por unidade de processamento
 
-            // Estabelece os passos iniciais e finais para cada unidade de processamento
+            // Estabelece temperaturas e finais para cada unidade de processamento
             for(i=1; i<nprocs; i++){
                 if(myrank == i){
                     if (myrank == 1){ 
@@ -92,16 +91,15 @@ int main(int argc, char** argv){
 
             // Cria um arquivo para armazenar os dados    
             FILE *arquivo_dados;
-            
-            if (CLUSTER == 0){
-                sprintf(nome_arquivo,"dados_%dx%dx%d_%u_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
-                    quantidade_medidas, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
+                        
+            sprintf(nome_arquivo,"dados_%dx%dx%d_%u_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
+                quantidade_medidas, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
 
-                if(myrank == 0) {
-                    arquivo_dados = fopen(nome_arquivo, "w"); // O arquivo é criado apenas no master
-                    temperatura = 0;
-                }
+            if(myrank == 0) {
+                arquivo_dados = fopen(nome_arquivo, "w"); // O arquivo é criado apenas no master
+                temperatura = 0;
             }
+            
             
             if(myrank != 0) {
                 // É calculado as medidas para cada temperatura
@@ -128,82 +126,65 @@ int main(int argc, char** argv){
                         // Variáveis para cálculo dos desvios e outras grandezas
                         magnetizacao_2_node += pow(mag, 2);
                         magnetizacao_4_node += pow(mag, 4);
-                        energia_2_node += pow(ene, 2);
-                        
-                        // Envia os dados de cada unidade de processamento para a unidade de processamento primária
-
-                        MPI_Gather(&temperatura_node, 1, MPI_DOUBLE, &temperatura, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                        MPI_Gather(&magnetizacao_node, 1, MPI_DOUBLE, &magnetizacao, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                        MPI_Gather(&energia_node, 1, MPI_DOUBLE, &energia, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                        MPI_Gather(&magnetizacao_2_node, 1, MPI_DOUBLE, &magnetizacao_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                        MPI_Gather(&magnetizacao_4_node, 1, MPI_DOUBLE, &magnetizacao_4, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                        MPI_Gather(&energia_2_node, 1, MPI_DOUBLE, &energia_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                        energia_2_node += pow(ene, 2);                        
                     }                    
                 }
+
+                // Envia os dados de cada unidade de processamento para a unidade de processamento primária
+                MPI_Gather(&temperatura_node, 1, MPI_DOUBLE, &temperatura, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                MPI_Gather(&magnetizacao_node, 1, MPI_DOUBLE, &magnetizacao, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                MPI_Gather(&energia_node, 1, MPI_DOUBLE, &energia, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                MPI_Gather(&magnetizacao_2_node, 1, MPI_DOUBLE, &magnetizacao_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                MPI_Gather(&magnetizacao_4_node, 1, MPI_DOUBLE, &magnetizacao_4, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                MPI_Gather(&energia_2_node, 1, MPI_DOUBLE, &energia_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
             }
-                // Se o processo estiver rodando na unidade de processamento primária, calcula-se as médias
+            
+            // Se o processo estiver rodando na unidade de processamento primária, calcula-se as médias
             if (myrank == 0) {
                     
-                    magnetizacao /= (double) fator_normalizacao;
-                    energia /= (double) fator_normalizacao;
-                    magnetizacao_2 /= (double) fator_normalizacao*NX*NY*NZ;
-                    magnetizacao_4 /= (double) fator_normalizacao*pow(NX*NY*NZ, 3);
-                    energia_2 /= (double) fator_normalizacao*NX*NY*NZ;
+                magnetizacao /= (double) fator_normalizacao;
+                energia /= (double) fator_normalizacao;
+                magnetizacao_2 /= (double) fator_normalizacao*NX*NY*NZ;
+                magnetizacao_4 /= (double) fator_normalizacao*pow(NX*NY*NZ, 3);
+                energia_2 /= (double) fator_normalizacao*NX*NY*NZ;
+                
+                // Calculamos outras grandezas
+                calor_especifico = (double) (NX*NY*NZ)*(energia_2 - pow(energia, 2))/(K_B*pow(temperatura, 2));
+                suscetibilidade_mag = (double) (NX*NY*NZ)*(magnetizacao_2 - pow(magnetizacao, 2))/(K_B*temperatura);
+                desvio_magnetizacao = (double) sqrt(magnetizacao_2 - pow(magnetizacao, 2));
+                desvio_energia = (double) sqrt(energia_2 - pow(energia, 2));
+                cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
+                
+                /*              
+                    Escrevemos os dados em um arquivo.
                     
-                    // Calculamos outras grandezas
-                    calor_especifico = (double) (NX*NY*NZ)*(energia_2 - pow(energia, 2))/(K_B*pow(temperatura, 2));
-                    suscetibilidade_mag = (double) (NX*NY*NZ)*(magnetizacao_2 - pow(magnetizacao, 2))/(K_B*temperatura);
-                    desvio_magnetizacao = (double) sqrt(magnetizacao_2 - pow(magnetizacao, 2));
-                    desvio_energia = (double) sqrt(energia_2 - pow(energia, 2));
-                    cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
-                    
-                    /*              
-                        Se a simulação não estiver rodando em um cluster, escrevemos os dados em um arquivo.
-                        Caso contrário escrevemos na tela.
+                    Será escrito no arquivo as seguintes colunas:
+                        Temperatura -  Magnetização média - desvio magnetização.
+                        energia média - desvio energia - calor específico 
+                        suscetibilidade magnética - cumulante de Binder
+                */
 
-                        Será escrito no arquivo as seguintes colunas:
-                            Temperatura -  Magnetização média - desvio magnetização.
-                            energia média - desvio energia - calor específico 
-                            suscetibilidade magnética - cumulante de Binder
-                    */
-
-                    if (CLUSTER == 0){
-                        printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, (int) MEDIDAS, (float) temperatura); // Porcentagem da simulacao
-                        fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
-                                            magnetizacao,
-                                            desvio_magnetizacao,
-                                            energia,
-                                            desvio_energia,
-                                            calor_especifico,
-                                            suscetibilidade_mag,
-                                            cumulante);
-                    } else {
-                        /* 
-                            Se estivermos usando um cluster, não será criado um arquivo pelo programa,
-                            mas gerado um arquivo a partir do comando "cat" do GNU/Linux com os dados que
-                            são impressos na tela.
-                        */     
-                        printf("%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
-                                            magnetizacao,
-                                            desvio_magnetizacao,
-                                            energia,
-                                            desvio_energia,
-                                            calor_especifico,
-                                            suscetibilidade_mag,
-                                            cumulante);
-                    }
-                }                
+                
+                printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, (int) MEDIDAS, (float) temperatura); // Porcentagem da simulacao
+                fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
+                                    magnetizacao,
+                                    desvio_magnetizacao,
+                                    energia,
+                                    desvio_energia,
+                                    calor_especifico,
+                                    suscetibilidade_mag,
+                                    cumulante);                
             }
-        if(CLUSTER == 0 && myrank == 0) fclose(arquivo_dados); // Fechamos o arquivo
+        
+        if(myrank == 0) fclose(arquivo_dados); // Fechamos o arquivo
         MPI_Finalize(); // Finalizamos o MPI
+        
         }
     }
 
-    // Registra o momento que o processo termina e imprime na tela se não estiver rodando num cluster
-    if(CLUSTER == 0){
-        fim = time(NULL);
-        printf("O tempo de execucao em segundos é %f\n", difftime(fim, inicio));
-    }
+    // Registra o momento que o processo termina e imprime na tela
+    fim = time(NULL);
+    printf("O tempo de execucao em segundos é %f\n", difftime(fim, inicio));
     
     return 0;
 }

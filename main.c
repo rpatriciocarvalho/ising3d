@@ -105,38 +105,39 @@ int main(int argc, char** argv){
                 // É calculado as medidas para cada temperatura
                 for(temperatura_node=inicio_node;temperatura_node<=fim_node; temperatura_node+=INCRE_TEMP){
                 
-                iniciar_rede(); 
-                // Zerando variáveis
-                magnetizacao = energia = 0.0;
-                magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
-                magnetizacao_node = energia_node = magnetizacao_2_node = 0.0;
-                magnetizacao_4_node = energia_2_node = 0.0;
-                
-                // Para cada unidade de processamento os passos de Monte Carlo
-                for(i=1; i <= N_PASSOS; i++){
+                    iniciar_rede(); 
+                    // Zerando variáveis
+                    magnetizacao = energia = 0.0;
+                    magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
+                    magnetizacao_node = energia_node = magnetizacao_2_node = 0.0;
+                    magnetizacao_4_node = energia_2_node = 0.0;
                     
-                    metropolis(temperatura_node); // Algoritmo de Metropolis
-                    
-                    // Começa a medir apenas depois da termalização
-                    if (i > passos_termalizacao){
-                        mag = fabsf(calcula_magnetizacao());
-                        ene = fabsf(calcula_energia());
-                        magnetizacao_node += mag;
-                        energia_node += ene;
-                        // Variáveis para cálculo dos desvios e outras grandezas
-                        magnetizacao_2_node += pow(mag, 2);
-                        magnetizacao_4_node += pow(mag, 4);
-                        energia_2_node += pow(ene, 2);                        
-                    }                    
-                }
+                    // Para cada unidade de processamento os passos de Monte Carlo
+                    for(i=1; i <= N_PASSOS; i++){
+                        
+                        metropolis(temperatura_node); // Algoritmo de Metropolis
+                        
+                        // Começa a medir apenas depois da termalização
+                        if (i > passos_termalizacao){
+                            mag = fabsf(calcula_magnetizacao());
+                            ene = fabsf(calcula_energia());
+                            magnetizacao_node += mag;
+                            energia_node += ene;
+                            // Variáveis para cálculo dos desvios e outras grandezas
+                            magnetizacao_2_node += pow(mag, 2);
+                            magnetizacao_4_node += pow(mag, 4);
+                            energia_2_node += pow(ene, 2);                        
+                        }                    
+                    }
 
-                // Envia os dados de cada unidade de processamento para a unidade de processamento primária
-                MPI_Gather(&temperatura_node, 1, MPI_DOUBLE, &temperatura, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                MPI_Gather(&magnetizacao_node, 1, MPI_DOUBLE, &magnetizacao, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                MPI_Gather(&energia_node, 1, MPI_DOUBLE, &energia, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                MPI_Gather(&magnetizacao_2_node, 1, MPI_DOUBLE, &magnetizacao_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                MPI_Gather(&magnetizacao_4_node, 1, MPI_DOUBLE, &magnetizacao_4, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-                MPI_Gather(&energia_2_node, 1, MPI_DOUBLE, &energia_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                    // Envia os dados de cada unidade de processamento para a unidade de processamento primária
+                    MPI_Gather(&temperatura_node, 1, MPI_DOUBLE, &temperatura, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                    MPI_Gather(&magnetizacao_node, 1, MPI_DOUBLE, &magnetizacao, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                    MPI_Gather(&energia_node, 1, MPI_DOUBLE, &energia, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                    MPI_Gather(&magnetizacao_2_node, 1, MPI_DOUBLE, &magnetizacao_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                    MPI_Gather(&magnetizacao_4_node, 1, MPI_DOUBLE, &magnetizacao_4, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                    MPI_Gather(&energia_2_node, 1, MPI_DOUBLE, &energia_2, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+                }
             }
             
             // Se o processo estiver rodando na unidade de processamento primária, calcula-se as médias
@@ -176,9 +177,8 @@ int main(int argc, char** argv){
                                     cumulante);                
             }
         
-        if(myrank == 0) fclose(arquivo_dados); // Fechamos o arquivo
-        MPI_Finalize(); // Finalizamos o MPI
-        
+            if(myrank == 0) fclose(arquivo_dados); // Fechamos o arquivo
+            MPI_Finalize(); // Finalizamos o MPI        
         }
     }
 

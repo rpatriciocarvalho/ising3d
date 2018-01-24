@@ -23,7 +23,7 @@ int main(int argc, char** argv){
     double magnetizacao_2, energia_2, magnetizacao_4;
     double desvio_magnetizacao, desvio_energia;
     double cumulante;
-    char nome_arquivo[25];
+    char nome_arquivo[50];
     int tamanho_linha = 180;
     char linha[tamanho_linha];
 
@@ -73,8 +73,8 @@ int main(int argc, char** argv){
             MPI_Status status;
 
             // Cria um arquivo para armazenar os dados   
-            sprintf(nome_arquivo,"dados_%dx%dx%d_%u_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
-                    quantidade_medidas, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
+            sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
+                        VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
 
             MPI_File_open(MPI_COMM_WORLD, nome_arquivo, MPI_MODE_CREATE|MPI_MODE_WRONLY, MPI_INFO_NULL, &file);
             
@@ -103,6 +103,9 @@ int main(int argc, char** argv){
                 magnetizacao = energia = 0.0;
                 magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
  
+                double j = 1.0;
+                double porcentagem_passos;
+
                 // Para cada unidade de processamento os passos de Monte Carlo
                 for(i=1; i <= N_PASSOS; i++){
                     
@@ -121,14 +124,15 @@ int main(int argc, char** argv){
                     }
 
                     // Porcentagem do progresso da simulação
-                    int j = 1;
-                    double porcentagem_passos;
+                    
 
-                    porcentagem_passos = (double) (i/N_PASSOS)*100;
+                    porcentagem_passos = ((i*1.0)/N_PASSOS)*100.0;
 
                     if(porcentagem_passos >= j) {
-		                if(myrank == 0) printf("%2.2f%% - %2.2f%% - $d\n",  (temperatura/fim_node)*100, porcentagem_passos, i);
-                        j++;
+                        if(myrank == 0)  {
+                            printf("%2.2f%% - %2.0f%% - %ld\n",  (temperatura/fim_node)*100, porcentagem_passos, i);
+                            j++;
+                        }
                     }                    
                 }
 

@@ -8,7 +8,7 @@
 
 // Parâmetros ---------------------------
 
-#define N_PASSOS            100000	// Número de passos de Monte Carlo
+#define N_PASSOS            10000	// Número de passos de Monte Carlo
 #define NX                  8           // Dimensão x da rede
 #define NY                  8           // Dimensão y da rede
 #define NZ                  8           // Dimensão z da rede

@@ -103,6 +103,7 @@ int main(int argc, char** argv){
                 magnetizacao = energia = 0.0;
                 magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
  
+                // Variáveis referentes a porcentagem do progresso
                 double j = 1.0;
                 double porcentagem_passos;
 
@@ -123,9 +124,7 @@ int main(int argc, char** argv){
                         energia_2 += pow(ene, 2);                        
                     }
 
-                    // Porcentagem do progresso da simulação
-                    
-
+                    // Porcentagem do progresso da simulação                  
                     porcentagem_passos = ((i*1.0)/N_PASSOS)*100.0;
 
                     if(porcentagem_passos >= j) {
@@ -158,7 +157,7 @@ int main(int argc, char** argv){
                         suscetibilidade magnética - cumulante de Binder
                 */
                 
-                sprintf(linha, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f", temperatura,
+                sprintf(linha, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
                                     magnetizacao,
                                     desvio_magnetizacao,
                                     energia,
@@ -167,7 +166,7 @@ int main(int argc, char** argv){
                                     suscetibilidade_mag,
                                     cumulante);   
 
-                MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status);
+                MPI_File_write(file, linha, tamanho_linha, MPI_CHAR, &status);
             }
             
             MPI_File_close(&file);

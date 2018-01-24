@@ -30,6 +30,9 @@ int main(int argc, char** argv){
     double inicio_node, fim_node, temperatura_node;
     double magnetizacao_node, energia_node, magnetizacao_2_node;
     double magnetizacao_4_node, energia_2_node;
+    double calor_especifico_node, suscetibilidade_mag_node, desvio_magnetizacao_node;
+    double desvio_energia_node, cumulante_node;
+
 
     time_t inicio; // Variáveis para marcar o tempo de execução
 	time_t fim;
@@ -70,14 +73,14 @@ int main(int argc, char** argv){
             
             m_temp_mpi = (double) TEMP_F/(nprocs - 1); // Divide a temperatura por unidade de processamento
 
-            // Estabelece temperaturas e finais para cada unidade de processamento
+            // Estabelece temperaturas iniciais e finais para cada unidade de processamento
             for(i=1; i<nprocs; i++){
                 if(myrank == i){
                     if (myrank == 1){ 
                         inicio_node = INCRE_TEMP;
                         fim_node = m_temp_mpi;
                     } else {
-                        inicio_node = i*m_temp_mpi;
+                        inicio_node = (i-1)*m_temp_mpi;
                         fim_node = inicio_node + m_temp_mpi;
                     }                    
                 }
@@ -100,15 +103,17 @@ int main(int argc, char** argv){
                 temperatura = 0;
             }
             
-            
+            // Zerando variáveis
+            magnetizacao = energia = 0.0;
+            magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
+
             if(myrank != 0) {
                 // É calculado as medidas para cada temperatura
                 for(temperatura_node=inicio_node;temperatura_node<=fim_node; temperatura_node+=INCRE_TEMP){
                 
                     iniciar_rede(); 
+                    
                     // Zerando variáveis
-                    magnetizacao = energia = 0.0;
-                    magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
                     magnetizacao_node = energia_node = magnetizacao_2_node = 0.0;
                     magnetizacao_4_node = energia_2_node = 0.0;
                     
@@ -166,7 +171,7 @@ int main(int argc, char** argv){
                 */
 
                 
-                printf("[%d/%d] - %2.2f%%\n", quantidade_medidas, (int) MEDIDAS, (float) temperatura); // Porcentagem da simulacao
+                printf("%2.2f%%\n", (float) temperatura); // Porcentagem da simulacao
                 fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
                                     magnetizacao,
                                     desvio_magnetizacao,
@@ -184,7 +189,7 @@ int main(int argc, char** argv){
 
     // Registra o momento que o processo termina e imprime na tela
     fim = time(NULL);
-    printf("O tempo de execucao em segundos é %f\n", difftime(fim, inicio));
+    printf("O tempo de execucao em segundos foi %f\n", difftime(fim, inicio));
     
     return 0;
 }

@@ -127,7 +127,7 @@ int main(int argc, char** argv){
                     porcentagem_passos = (double) (i/N_PASSOS)*100;
 
                     if(porcentagem_passos >= j) {
-		                if(myrank == 0) printf("%2.2f%% - %2.2f%% - $d\n",  (temperatura/fim_node)*100, porcentagem_passos, i);
+		                printf("[%d] %2.2f%% - %2.2f%% - %d\n", myrank, (temperatura/fim_node)*100, porcentagem_passos, i);
                         j++;
                     }                    
                 }

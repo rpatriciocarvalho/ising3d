@@ -68,7 +68,7 @@ int main(int argc, char** argv){
             MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
             MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
             
-            MPI_Offset offset;
+//            MPI_Offset offset;
             MPI_File   file;
             MPI_Status status;
 
@@ -83,13 +83,8 @@ int main(int argc, char** argv){
             // Estabelece temperaturas iniciais e finais para cada unidade de processamento
             for(i=0; i<nprocs; i++){
                 if(myrank == i){
-                    if (myrank == 0){ 
-                        inicio_node = INCRE_TEMP;
-                        fim_node = m_temp_mpi;
-                    } else {
-                        inicio_node = m_temp_mpi + INCRE_TEMP;
-                        fim_node = inicio_node + m_temp_mpi;
-                    }                    
+                        inicio_node = myrank*m_temp_mpi + INCRE_TEMP;
+                        fim_node = inicio_node + m_temp_mpi; 
                 }
             }
 
@@ -98,7 +93,7 @@ int main(int argc, char** argv){
             
             // Fator de normalização que será usado nas médias
             fator_normalizacao = (unsigned long int) (N_PASSOS - N_PASSOS*0.1)*NX*NY*NZ;
-            
+
             // É calculado as medidas para cada temperatura
             for(temperatura=inicio_node; temperatura <= fim_node; temperatura+=INCRE_TEMP){
             
@@ -107,7 +102,7 @@ int main(int argc, char** argv){
                 // Zerando variáveis
                 magnetizacao = energia = 0.0;
                 magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
-                
+ 
                 // Para cada unidade de processamento os passos de Monte Carlo
                 for(i=1; i <= N_PASSOS; i++){
                     
@@ -123,6 +118,17 @@ int main(int argc, char** argv){
                         magnetizacao_2 += pow(mag, 2);
                         magnetizacao_4 += pow(mag, 4);
                         energia_2 += pow(ene, 2);                        
+                    }
+
+                    // Porcentagem do progresso da simulação
+                    int j = 1;
+                    double porcentagem_passos;
+
+                    porcentagem_passos = (double) (i/N_PASSOS)*100;
+
+                    if(porcentagem_passos >= j) {
+		                if(myrank == 0) printf("%2.2f%% - %2.2f%% - $d\n",  (temperatura/fim_node)*100, porcentagem_passos, i);
+                        j++;
                     }                    
                 }
 
@@ -156,9 +162,8 @@ int main(int argc, char** argv){
                                     calor_especifico,
                                     suscetibilidade_mag,
                                     cumulante);   
-                printf("%f\n", temperatura);
-                MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status);
 
+                MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status);
             }
             
             MPI_File_close(&file);

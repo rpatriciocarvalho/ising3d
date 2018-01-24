@@ -24,7 +24,7 @@ int main(int argc, char** argv){
     double desvio_magnetizacao, desvio_energia;
     double cumulante;
     char nome_arquivo[25];
-    int tamanho_linha = 250;
+    int tamanho_linha = 180;
     char linha[tamanho_linha];
 
     // Variáveis para computação paralela
@@ -100,7 +100,7 @@ int main(int argc, char** argv){
             fator_normalizacao = (unsigned long int) (N_PASSOS - N_PASSOS*0.1)*NX*NY*NZ;
             
             // É calculado as medidas para cada temperatura
-            for(temperatura_node=inicio_node;temperatura_node<=fim_node; temperatura_node+=INCRE_TEMP){
+            for(temperatura=inicio_node; temperatura <= fim_node; temperatura+=INCRE_TEMP){
             
                 iniciar_rede(); 
                 
@@ -111,7 +111,7 @@ int main(int argc, char** argv){
                 // Para cada unidade de processamento os passos de Monte Carlo
                 for(i=1; i <= N_PASSOS; i++){
                     
-                    metropolis(temperatura_node); // Algoritmo de Metropolis
+                    metropolis(temperatura); // Algoritmo de Metropolis
                     
                     // Começa a medir apenas depois da termalização
                     if (i > passos_termalizacao){
@@ -148,7 +148,7 @@ int main(int argc, char** argv){
                         suscetibilidade magnética - cumulante de Binder
                 */
                 
-                sprintf(linha, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
+                sprintf(linha, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f", temperatura,
                                     magnetizacao,
                                     desvio_magnetizacao,
                                     energia,
@@ -156,8 +156,8 @@ int main(int argc, char** argv){
                                     calor_especifico,
                                     suscetibilidade_mag,
                                     cumulante);   
-
-                MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status)
+                printf("%f\n", temperatura);
+                MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status);
 
             }
             

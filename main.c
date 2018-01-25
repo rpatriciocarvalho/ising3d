@@ -73,8 +73,8 @@ int main(int argc, char** argv){
             MPI_Status status;
 
             // Cria um arquivo para armazenar os dados   
-            sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
-                        VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
+            sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d]-%d.dat", NX, NY, NZ, N_PASSOS, 
+                        VIZINHO_X, VIZINHO_Y, VIZINHO_Z, myrank);
 
             MPI_File_open(MPI_COMM_WORLD, nome_arquivo, MPI_MODE_CREATE|MPI_MODE_WRONLY, MPI_INFO_NULL, &file);
             

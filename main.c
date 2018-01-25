@@ -128,8 +128,10 @@ int main(int argc, char** argv){
                     porcentagem_passos = ((i*1.0)/N_PASSOS)*100.0;
 
                     if(porcentagem_passos >= j) {
-		                printf("[%d] %2.2f%% - %2.2f%% - %d\n", myrank, (temperatura/fim_node)*100, porcentagem_passos, i);
-                        j++;
+			if (myrank == 0){   
+		        	printf("%2.2f%% - %2.2f%% - %d\n", (temperatura/fim_node)*100, porcentagem_passos, i);
+                        	j++;
+			}
                     }                    
                 }
 

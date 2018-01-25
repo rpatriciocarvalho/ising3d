@@ -24,7 +24,7 @@ int main(int argc, char** argv){
     double desvio_magnetizacao, desvio_energia;
     double cumulante;
     char nome_arquivo[50];
-    int tamanho_linha = 180;
+    int tamanho_linha = 200;
     char linha[tamanho_linha];
 
     // Variáveis para computação paralela
@@ -157,7 +157,7 @@ int main(int argc, char** argv){
                         suscetibilidade magnética - cumulante de Binder
                 */
                 
-                sprintf(linha, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
+                sprintf(linha, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f", temperatura,
                                     magnetizacao,
                                     desvio_magnetizacao,
                                     energia,
@@ -166,7 +166,7 @@ int main(int argc, char** argv){
                                     suscetibilidade_mag,
                                     cumulante);   
 
-                MPI_File_write(file, linha, tamanho_linha, MPI_CHAR, &status);
+                MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status);
             }
             
             MPI_File_close(&file);

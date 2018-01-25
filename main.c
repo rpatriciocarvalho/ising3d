@@ -68,15 +68,17 @@ int main(int argc, char** argv){
             MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
             MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
             
-//            MPI_Offset offset;
-            MPI_File   file;
-            MPI_Status status;
+            //MPI_Offset offset;
+            //MPI_File   file;
+            //MPI_Status status;
 
             // Cria um arquivo para armazenar os dados   
             sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d]-%d.dat", NX, NY, NZ, N_PASSOS, 
                         VIZINHO_X, VIZINHO_Y, VIZINHO_Z, myrank);
+            FILE *arquivo_dados; 
+            arquivo_dados = fopen(nome_arquivo, "w");
 
-            MPI_File_open(MPI_COMM_WORLD, nome_arquivo, MPI_MODE_CREATE|MPI_MODE_WRONLY, MPI_INFO_NULL, &file);
+            //MPI_File_open(MPI_COMM_WORLD, nome_arquivo, MPI_MODE_CREATE|MPI_MODE_WRONLY, MPI_INFO_NULL, &file);
             
             m_temp_mpi = (double) TEMP_F/nprocs; // Divide a temperatura por unidade de processamento
 
@@ -128,10 +130,10 @@ int main(int argc, char** argv){
                     porcentagem_passos = ((i*1.0)/N_PASSOS)*100.0;
 
                     if(porcentagem_passos >= j) {
-			if (myrank == 0){   
-		        	printf("%2.2f%% - %2.2f%% - %d\n", (temperatura/fim_node)*100, porcentagem_passos, i);
+			            if (myrank == 0){   
+		        	        printf("%2.2f%% - %2.2f%% - %d\n", (temperatura/fim_node)*100, porcentagem_passos, i);
                         	j++;
-			}
+			            }   
                     }                    
                 }
 
@@ -157,6 +159,7 @@ int main(int argc, char** argv){
                         suscetibilidade magnética - cumulante de Binder
                 */
                 
+                /*
                 sprintf(linha, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
                                     magnetizacao,
                                     desvio_magnetizacao,
@@ -167,9 +170,20 @@ int main(int argc, char** argv){
                                     cumulante);   
 
                 MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status);
+                */
+
+                fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
+                                            magnetizacao,
+                                            desvio_magnetizacao,
+                                            energia,
+                                            desvio_energia,
+                                            calor_especifico,
+                                            suscetibilidade_mag,
+                                            cumulante);
             }
             
-            MPI_File_close(&file);
+            //MPI_File_close(&file);
+            fclose(arquivo_dados);
             MPI_Finalize(); // Finalizamos o MPI        
         }
     }

@@ -6,7 +6,7 @@
 
 */
 
-#include "funcoes_ising2d.h"
+#include "funcoes.h"
 
 void iniciar_rede(){
 

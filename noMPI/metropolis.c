@@ -6,7 +6,7 @@
 
 */
 
-#include "funcoes_ising2d.h"
+#include "funcoes.h"
 #include <math.h>
 #include <stdlib.h>
 

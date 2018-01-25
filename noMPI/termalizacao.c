@@ -1,4 +1,4 @@
-#include "funcoes_ising2d.h"
+#include "funcoes.h"
 #include <stdio.h>
 #include <math.h>
 

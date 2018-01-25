@@ -6,7 +6,7 @@
 
 */
 
-#include "funcoes_ising2d.h"
+#include "funcoes.h"
 
 int vizinho_nulo(int x, int y, int z, int posicao){
 

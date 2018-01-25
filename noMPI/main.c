@@ -4,7 +4,7 @@
     Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
 
     Observações: Os parâmetros da simulação devem se modificados
-                 no arquivo 'funcoes_ising2d.h'
+                 no arquivo 'funcoes.h'
 
 */
 
@@ -12,7 +12,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
-#include "funcoes_ising2d.h"
+#include "funcoes.h"
 
 int main(int argc, char** argv){
 

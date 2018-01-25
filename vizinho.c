@@ -1,4 +1,4 @@
-#include "funcoes_ising2d.h"
+#include "funcoes.h"
 
 int vizinho(int x, int y, int z, int posicao, int condicao){
     

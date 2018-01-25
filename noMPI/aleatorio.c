@@ -5,7 +5,7 @@
     Autor: Rodrigo Carvalho (rpatriciocarvalho@gmail.com)
 */
 
-#include "funcoes_ising2d.h"
+#include "funcoes.h"
 
 int aleatorio(){
 

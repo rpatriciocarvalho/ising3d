@@ -12,7 +12,6 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
-#include <mpi.h>
 #include "funcoes.h"
 
 int main(int argc, char** argv){
@@ -55,8 +54,8 @@ int main(int argc, char** argv){
     if (TERMALIZACAO == 0) {
 
         // Cria um arquivo para armazenar os dados   
-        sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d]-%d.dat", NX, NY, NZ, N_PASSOS, 
-                    VIZINHO_X, VIZINHO_Y, VIZINHO_Z, myrank);
+        sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d].dat", NX, NY, NZ, N_PASSOS, 
+                    VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
         FILE *arquivo_dados; 
         arquivo_dados = fopen(nome_arquivo, "w");
         
@@ -100,7 +99,7 @@ int main(int argc, char** argv){
                 porcentagem_passos = ((i*1.0)/N_PASSOS)*100.0;
 
                 if(porcentagem_passos >= j) {
-                    printf("%2.2f%% - %2.2f%%\n", (temperatura/fim_node)*100, porcentagem_passos);
+                    printf("%2.2f%% - %2.2f%%\n", (temperatura/TEMP_F)*100, porcentagem_passos);
                     j++;   
                 }                    
             }

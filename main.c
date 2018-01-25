@@ -65,17 +65,11 @@ int main(int argc, char** argv){
         MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
         MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
         
-        //MPI_Offset offset;
-        //MPI_File   file;
-        //MPI_Status status;
-
         // Cria um arquivo para armazenar os dados   
         sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d]-%d.dat", NX, NY, NZ, N_PASSOS, 
                     VIZINHO_X, VIZINHO_Y, VIZINHO_Z, myrank);
         FILE *arquivo_dados; 
         arquivo_dados = fopen(nome_arquivo, "w");
-
-        //MPI_File_open(MPI_COMM_WORLD, nome_arquivo, MPI_MODE_CREATE|MPI_MODE_WRONLY, MPI_INFO_NULL, &file);
         
         m_temp_mpi = (double) (TEMP_F*1.0)/(nprocs*1.0); // Divide a temperatura por unidade de processamento
 
@@ -124,7 +118,7 @@ int main(int argc, char** argv){
 
                 if(porcentagem_passos >= j) {
                     if (myrank == 0){   
-                        printf("%2.2f%% - %2.2f%% - %d\n", (temperatura/fim_node)*100, porcentagem_passos, i);
+                        printf("%2.2f%% - %2.2f%%\n", (temperatura/fim_node)*100, porcentagem_passos);
                         j++;
                     }   
                 }                    

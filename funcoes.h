@@ -13,7 +13,7 @@
 #define NY                  8           // Dimensão y da rede
 #define NZ                  8           // Dimensão z da rede
 #define TEMP_I              1         // Temperatura inicial da rede
-#define TEMP_F              4          // Temperatura final da rede
+#define TEMP_F              8          // Temperatura final da rede
 #define INCRE_TEMP          0.1         // Incremento da temperatura
 #define J                   1           // Constante de acoplamento
 #define K_B                 1           // Constate de Boltzmann

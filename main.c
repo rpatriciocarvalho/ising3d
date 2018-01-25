@@ -80,10 +80,10 @@ int main(int argc, char** argv){
 
             //MPI_File_open(MPI_COMM_WORLD, nome_arquivo, MPI_MODE_CREATE|MPI_MODE_WRONLY, MPI_INFO_NULL, &file);
             
-            m_temp_mpi = (double) TEMP_F/nprocs; // Divide a temperatura por unidade de processamento
+            m_temp_mpi = (double) (TEMP_F*1.0)/(nprocs*1.0); // Divide a temperatura por unidade de processamento
 
             // Estabelece temperaturas iniciais e finais para cada unidade de processamento
-            inicio_node = myrank*m_temp_mpi + INCRE_TEMP;
+            inicio_node = (myrank*1.0)*m_temp_mpi + INCRE_TEMP*(1.0);
             fim_node = inicio_node + m_temp_mpi; 
 
             // Definindo 10% do número total de passos para termalizar.

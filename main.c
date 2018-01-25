@@ -128,15 +128,8 @@ int main(int argc, char** argv){
                     porcentagem_passos = ((i*1.0)/N_PASSOS)*100.0;
 
                     if(porcentagem_passos >= j) {
-<<<<<<< HEAD
 		                printf("[%d] %2.2f%% - %2.2f%% - %d\n", myrank, (temperatura/fim_node)*100, porcentagem_passos, i);
                         j++;
-=======
-                        if(myrank == 0)  {
-                            printf("%2.2f%% - %2.0f%% - %ld\n",  (temperatura/fim_node)*100, porcentagem_passos, i);
-                            j++;
-                        }
->>>>>>> c9ebe65db35a6800064d823bc2467e7727fd8b23
                     }                    
                 }
 
@@ -171,7 +164,7 @@ int main(int argc, char** argv){
                                     suscetibilidade_mag,
                                     cumulante);   
 
-                MPI_File_write(file, linha, tamanho_linha, MPI_CHAR, &status);
+                MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status);
             }
             
             MPI_File_close(&file);

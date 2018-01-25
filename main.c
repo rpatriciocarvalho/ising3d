@@ -83,12 +83,8 @@ int main(int argc, char** argv){
             m_temp_mpi = (double) TEMP_F/nprocs; // Divide a temperatura por unidade de processamento
 
             // Estabelece temperaturas iniciais e finais para cada unidade de processamento
-            //for(i=0; i<nprocs; i++){
-            //    if(myrank == i){
-                        inicio_node = myrank*m_temp_mpi + INCRE_TEMP;
-                        fim_node = inicio_node + m_temp_mpi; 
-            //    }
-            //}
+            inicio_node = myrank*m_temp_mpi + INCRE_TEMP;
+            fim_node = inicio_node + m_temp_mpi; 
 
             // Definindo 10% do número total de passos para termalizar.
             passos_termalizacao = N_PASSOS*0.1;

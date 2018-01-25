@@ -168,7 +168,7 @@ int main(int argc, char** argv){
                 MPI_File_write_all(file, linha, tamanho_linha, MPI_CHAR, &status);
                 */
 
-                fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
+                fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f XXXX\n", temperatura,
                                             magnetizacao,
                                             desvio_magnetizacao,
                                             energia,

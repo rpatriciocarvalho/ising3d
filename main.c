@@ -13,6 +13,8 @@
 #include <time.h>
 #include <stdlib.h>
 #include <mpi.h>
+#include <unistd.h>
+#include "mt19937ar.h"
 #include "funcoes.h"
 
 int main(int argc, char** argv){
@@ -36,7 +38,7 @@ int main(int argc, char** argv){
         
     // Iniciando o gerador de números aleatórios
     srand(time(NULL)); // Inicia semente
-    rmarin((int) rand()%31328, (int) rand()%30081); //inicia o ranmar
+    init_genrand((int) rand()%31328);
 
    /*
     Se "TERMALIZACAO" for diferente de zero, então
@@ -85,7 +87,8 @@ int main(int argc, char** argv){
 
         // É calculado as medidas para cada temperatura
         for(temperatura=inicio_node; temperatura <= fim_node; temperatura+=INCRE_TEMP){
-        
+            
+            sleep((int) myrank + 1) // Cada unidade de processamento iniciará após um determinado tempo
             iniciar_rede(); 
             
             // Zerando variáveis

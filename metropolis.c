@@ -9,6 +9,7 @@
 #include "funcoes.h"
 #include <math.h>
 #include <stdlib.h>
+#include "mt19937ar.h"
 
 void metropolis(float temperatura){
 
@@ -34,7 +35,7 @@ void metropolis(float temperatura){
                     rede[x][y][z] *= -1;
                 } else {
                     exponencial = (double) pow(M_E, (double) (-delta_energia)/(K_B*temperatura));
-                    if(exponencial > ranmar()) rede[x][y][z] *= -1;
+                    if(exponencial > genrand_real2()) rede[x][y][z] *= -1;
                 }
             }
         }

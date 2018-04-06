@@ -88,7 +88,7 @@ int main(int argc, char** argv){
         // É calculado as medidas para cada temperatura
         for(temperatura=inicio_node; temperatura <= fim_node; temperatura+=INCRE_TEMP){
             
-            sleep((int) myrank + 1) // Cada unidade de processamento iniciará após um determinado tempo
+            sleep((int) myrank + 1); // Cada unidade de processamento iniciará após um determinado tempo
             iniciar_rede(); 
             
             // Zerando variáveis

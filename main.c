@@ -60,32 +60,34 @@ int main(int argc, char** argv){
     */
 
     if (TERMALIZACAO == 0) {
-
-        // Inclusão do MPI
-        int myrank, nprocs;
+        int id_registro = 0;
 
         // Conexao com a base de dados
         MYSQL conexao;
         mysql_init(&conexao);
         mysql_real_connect(&conexao, HOST, DBUSUARIO, DBSENHA, BASEDADOS, 0, NULL, 0);
-       
-        if (myrank == 0){
-            // Inserindo dados de registro
-            char query_registro[2000];
-            int id_registro;
 
-            sprintf(query_registro, "INSERT INTO registro (n_proc, n_passos, temp_i, temp_f, temp_incre, nx, ny, nz, cx, cy, cz) "
-                "values(%d, %d, %f, %f, %f, %d, %d, %d, %d, %d, %d, %s)",  
-                nprocs, N_PASSOS, TEMP_I, TEMP_F, INCRE_TEMP, NX, NY, NZ, CX, CY, CZ, difftime(fim, inicio));
-            mysql_query(&conexao, query_registro);
-
-            id_registro = mysql_insert_id(&conexao);
-        }
+        // Inclusão do MPI
+        int myrank, nprocs;
 
         MPI_Init(&argc, &argv);
         MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
         MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
         
+        if (myrank == 0){
+            // Inserindo dados de registro
+            char query_registro[2000];
+            
+            sprintf(query_registro, "INSERT INTO registro (n_proc, n_passos, temp_i, temp_f, temp_incre, nx, ny, nz, cx, cy, cz) "
+                "values(%d, %d, %f, %f, %f, %d, %d, %d, %d, %d, %d)",  
+                nprocs, N_PASSOS, TEMP_I, TEMP_F, INCRE_TEMP, NX, NY, NZ, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
+            mysql_query(&conexao, query_registro);
+
+            id_registro = mysql_insert_id(&conexao);
+        }
+
+        MPI_Bcast(&id_registro, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
         /*
         // Cria um arquivo para armazenar os dados   
         sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d]-%d.dat", NX, NY, NZ, N_PASSOS, 

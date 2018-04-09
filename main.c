@@ -26,7 +26,6 @@ int main(int argc, char** argv){
     double magnetizacao_2, energia_2, magnetizacao_4;
     double desvio_magnetizacao, desvio_energia;
     double cumulante;
-    char nome_arquivo[50];
 
     // Variáveis para computação paralela
     double m_temp_mpi;
@@ -62,7 +61,8 @@ int main(int argc, char** argv){
     if (TERMALIZACAO == 0) {
         int id_registro = 0;
         int res;
-
+        char query_dados[2200];
+            
         // Conexao com a base de dados
         MYSQL conexao;
         mysql_init(&conexao);
@@ -79,17 +79,16 @@ int main(int argc, char** argv){
             // Inserindo dados de registro
             char query_registro[2000];
             
-            sprintf(query_registro, "INSERT INTO registro (n_proc, n_passos, temp_i, temp_f, temp_incre, nx, ny, nz, cx, cy, cz) "
-                "values(%d, %d, %f, %f, %f, %d, %d, %d, %d, %d, %d)",  
+            sprintf(query_registro, "INSERT INTO registro (n_proc, n_passos, temp_i, temp_f, temp_incr, nx, ny, nz, cx, cy, cz, duracao) "
+                "values(%d, %d, %f, %f, %f, %d, %d, %d, %d, %d, %d, 0)",  
                 nprocs, N_PASSOS, TEMP_I, TEMP_F, INCRE_TEMP, NX, NY, NZ, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
-            res = mysql_query(&conexao, query_registro);
-
-            if (!res) printf("Registros inseridos %d\n", mysql_affected_rows(&conexao));
-            else printf("Erro na inserção %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
+            mysql_query(&conexao, query_registro);
             
+            // Capturando ID da última query
             id_registro = mysql_insert_id(&conexao);
         }
 
+        // Enviando a id da última quere para todas as unidades de processamento
         MPI_Bcast(&id_registro, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
         /*
@@ -100,7 +99,8 @@ int main(int argc, char** argv){
         arquivo_dados = fopen(nome_arquivo, "w");
         */
 
-        m_temp_mpi = (double) (TEMP_F*1.0 - TEMP_I*1.0)/(nprocs*1.0); // Divide a temperatura por unidade de processamento
+        // Divide a temperatura por unidade de processamento
+        m_temp_mpi = (double) (TEMP_F*1.0 - TEMP_I*1.0)/(nprocs*1.0);
 
         // Estabelece temperaturas iniciais e finais para cada unidade de processamento
         inicio_node = TEMP_I + (myrank*1.0)*m_temp_mpi + INCRE_TEMP*(1.0);
@@ -115,14 +115,19 @@ int main(int argc, char** argv){
         // É calculado as medidas para cada temperatura
         for(temperatura=inicio_node; temperatura <= fim_node; temperatura+=INCRE_TEMP){
             
-            sleep((int) myrank + 1); // Cada unidade de processamento iniciará após um determinado tempo
+            // "Limpando" a variável query_dados
+            memset(&query_dados, "0", sizeof(query_dados));
+            
+            // Cada unidade de processamento iniciará após um determinado tempo
+            sleep((int) myrank + 1); 
+            
             iniciar_rede(); 
             
             // Zerando variáveis
             magnetizacao = energia = 0.0;
             magnetizacao_2 = magnetizacao_4 = energia_2 = 0.0;
 
-            // Variáveis referentes a porcentagem do progresso
+            // Variáveis referentes a porcentagem do programa
             double j = 1.0;
             double porcentagem_passos;
 
@@ -148,7 +153,7 @@ int main(int argc, char** argv){
 
                 if(porcentagem_passos >= j) {
                     if (myrank == 0){   
-                        printf("%2.2f%% - %2.2f%%\n", (temperatura/fim_node)*100, porcentagem_passos);
+                        printf("%2.2f%% - %2.2f%%\n", (temperatura/(fim_node-inicio_node))*100, porcentagem_passos);
                         j++;
                     }   
                 }                    
@@ -168,11 +173,9 @@ int main(int argc, char** argv){
             cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
 
             // Inserindo dados de registro
-            char query_dados[2000];
-            
             sprintf(query_dados, "INSERT INTO dados (id_registro, temp, mag, desv_mag, energia, desv_energia, calor_esp, sus_mag, cumulante) "
                 "values(%d, %f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f)",  
-                id_registro, magnetizacao, desvio_magnetizacao, energia, desvio_energia, calor_especifico, suscetibilidade_mag, cumulante);
+                id_registro, temperatura, magnetizacao, desvio_magnetizacao, energia, desvio_energia, calor_especifico, suscetibilidade_mag, cumulante);
             mysql_query(&conexao, query_dados);
             
             /*              
@@ -197,18 +200,19 @@ int main(int argc, char** argv){
         }
         
         //fclose(arquivo_dados);
-        MPI_Finalize(); // Finalizamos o MPI        
 
-        // Registra o momento que o processo termina e imprime na tela
-        fim = time(NULL);
-        printf("Tempo: %f\n", difftime(fim, inicio));
-        
         if (myrank == 0){
+            // Registra o momento que o processo termina e imprime na tela
+            fim = time(NULL);
+            printf("Tempo: %f\n", difftime(fim, inicio));
+            
             // Inserindo dados de registro
             char query_registro_update[100];
             sprintf(query_registro_update, "UPDATE registro SET duracao='%s' WHERE id=%d", difftime(fim, inicio), id_registro);
             mysql_query(&conexao, query_registro_update);
         }
+        
+        MPI_Finalize(); // Finalizamos o MPI        
 
         mysql_close(&conexao);    
     }

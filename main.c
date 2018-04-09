@@ -61,6 +61,7 @@ int main(int argc, char** argv){
 
     if (TERMALIZACAO == 0) {
         int id_registro = 0;
+        int res;
 
         // Conexao com a base de dados
         MYSQL conexao;
@@ -81,8 +82,11 @@ int main(int argc, char** argv){
             sprintf(query_registro, "INSERT INTO registro (n_proc, n_passos, temp_i, temp_f, temp_incre, nx, ny, nz, cx, cy, cz) "
                 "values(%d, %d, %f, %f, %f, %d, %d, %d, %d, %d, %d)",  
                 nprocs, N_PASSOS, TEMP_I, TEMP_F, INCRE_TEMP, NX, NY, NZ, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
-            mysql_query(&conexao, query_registro);
+            res = mysql_query(&conexao, query_registro);
 
+            if (!res) printf("Registros inseridos %d\n", mysql_affected_rows(&conexao));
+            else printf("Erro na inserção %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
+            
             id_registro = mysql_insert_id(&conexao);
         }
 

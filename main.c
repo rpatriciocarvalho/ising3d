@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include "mt19937ar.h"
 #include "funcoes.h"
+#include <mysql/mysql.h>
 
 int main(int argc, char** argv){
 
@@ -63,16 +64,36 @@ int main(int argc, char** argv){
         // Inclusão do MPI
         int myrank, nprocs;
 
+        // Conexao com a base de dados
+        MYSQL conexao;
+        mysql_init(&conexao);
+        mysql_real_connect(&conexao, HOST, DBUSUARIO, DBSENHA, BASEDADOS, 0, NULL, 0);
+       
+        if (myrank == 0){
+            // Inserindo dados de registro
+            char query_registro[2000];
+            int id_registro;
+
+            sprintf(query_registro, "INSERT INTO registro (n_proc, n_passos, temp_i, temp_f, temp_incre, nx, ny, nz, cx, cy, cz) "
+                "values(%d, %d, %f, %f, %f, %d, %d, %d, %d, %d, %d, %s)",  
+                nprocs, N_PASSOS, TEMP_I, TEMP_F, INCRE_TEMP, NX, NY, NZ, CX, CY, CZ, difftime(fim, inicio));
+            mysql_query(&conexao, query_registro);
+
+            id_registro = mysql_insert_id(&conexao);
+        }
+
         MPI_Init(&argc, &argv);
         MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
         MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
         
+        /*
         // Cria um arquivo para armazenar os dados   
         sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d]-%d.dat", NX, NY, NZ, N_PASSOS, 
                     VIZINHO_X, VIZINHO_Y, VIZINHO_Z, myrank);
         FILE *arquivo_dados; 
         arquivo_dados = fopen(nome_arquivo, "w");
-        
+        */
+
         m_temp_mpi = (double) (TEMP_F*1.0 - TEMP_I*1.0)/(nprocs*1.0); // Divide a temperatura por unidade de processamento
 
         // Estabelece temperaturas iniciais e finais para cada unidade de processamento
@@ -139,6 +160,14 @@ int main(int argc, char** argv){
             desvio_magnetizacao = (double) sqrt(magnetizacao_2 - pow(magnetizacao, 2));
             desvio_energia = (double) sqrt(energia_2 - pow(energia, 2));
             cumulante = 1-(magnetizacao_4/(3*pow(magnetizacao_2, 2)));
+
+            // Inserindo dados de registro
+            char query_dados[2000];
+            
+            sprintf(query_dados, "INSERT INTO dados (id_registro, temp, mag, desv_mag, energia, desv_energia, calor_esp, sus_mag, cumulante) "
+                "values(%d, %f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f)",  
+                id_registro, magnetizacao, desvio_magnetizacao, energia, desvio_energia, calor_especifico, suscetibilidade_mag, cumulante);
+            mysql_query(&conexao, query_dados);
             
             /*              
                 Escrevemos os dados em um arquivo.
@@ -147,8 +176,8 @@ int main(int argc, char** argv){
                     Temperatura -  Magnetização média - desvio magnetização.
                     energia média - desvio energia - calor específico 
                     suscetibilidade magnética - cumulante de Binder
-            */
-    
+            
+           
             fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
                                         magnetizacao,
                                         desvio_magnetizacao,
@@ -157,17 +186,26 @@ int main(int argc, char** argv){
                                         calor_especifico,
                                         suscetibilidade_mag,
                                         cumulante);
-        
+
+            */
         }
         
-        fclose(arquivo_dados);
+        //fclose(arquivo_dados);
         MPI_Finalize(); // Finalizamos o MPI        
+
+        // Registra o momento que o processo termina e imprime na tela
+        fim = time(NULL);
+        printf("Tempo: %f\n", difftime(fim, inicio));
         
+        if (myrank == 0){
+            // Inserindo dados de registro
+            char query_registro_update[100];
+            sprintf(query_registro_update, "UPDATE registro SET duracao='%s' WHERE id=%d", difftime(fim, inicio), id_registro);
+            mysql_query(&conexao, query_registro_update);
+        }
+
+        mysql_close(&conexao);    
     }
 
-    // Registra o momento que o processo termina e imprime na tela
-    fim = time(NULL);
-    printf("O tempo de execucao em segundos foi %f\n", difftime(fim, inicio));
-    
     return 0;
 }

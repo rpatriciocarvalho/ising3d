@@ -63,6 +63,15 @@ int main(int argc, char** argv){
         int id_registro = 0;
         char query_dados[2200];
             
+        int tamanho_array_temperaturas_medidas = 0;
+        tamanho_array_temperaturas_medidas = (TEMP_F-TEMP_I)/INCRE_TEMP;
+
+        float temperaturas_medidas[tamanho_array_temperaturas_medidas];
+
+        for(i = 0; i < tamanho_array_temperaturas_medidas; i++){
+            temperaturas_medidas[i] = TEMP_I + i*INCRE_TEMP;
+        }
+        
         // Conexao com a base de dados
         MYSQL conexao;
         mysql_init(&conexao);
@@ -90,15 +99,6 @@ int main(int argc, char** argv){
 
         // Enviando a id da última quere para todas as unidades de processamento
         MPI_Bcast(&id_registro, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-        int tamanho_array_temperaturas_medidas = 0;
-        tamanho_array_temperaturas_medidas = (TEMP_F-TEMP_I)/INCRE_TEMP;
-
-        float temperaturas_medidas[tamanho_array_temperaturas_medidas];
-
-        for(i = 0; i < tamanho_array_temperaturas_medidas; i++){
-            temperaturas_medidas[i] = TEMP_I + i*INCRE_TEMP;
-        }
 
         inicio_node = myrank*(tamanho_array_temperaturas_medidas/nprocs);
         fim_node = inicio_node + (tamanho_array_temperaturas_medidas/nprocs) - 1;
@@ -129,7 +129,7 @@ int main(int argc, char** argv){
             
             // A temperatura que sera calculada
             temperatura = temperaturas_medidas[k];
-
+            
             iniciar_rede(); 
             
             // Zerando variáveis
@@ -162,7 +162,7 @@ int main(int argc, char** argv){
 
                 if(porcentagem_passos >= j) {
                     if (myrank == 0){   
-                        printf("%2.2f%% - %2.2f%%\n", ( (temperatura-inicio_node)/(fim_node-inicio_node)*100, porcentagem_passos);
+                        printf("%2.2f%% - %2.2f%%\n", ((k-inicio_node)/(fim_node-inicio_node))*100, porcentagem_passos);
                         j++;
                     }   
                 }                    

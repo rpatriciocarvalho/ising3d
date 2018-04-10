@@ -17,10 +17,11 @@
 #include "mt19937ar.h"
 #include "funcoes.h"
 #include <mysql/mysql.h>
+#include <string.h>
 
 int main(int argc, char** argv){
 
-    unsigned long int i, passos_termalizacao;
+    unsigned long int i, passos_termalizacao, k;
     double magnetizacao, energia, temperatura, fator_normalizacao;
     double calor_especifico, suscetibilidade_mag, mag, ene;
     double magnetizacao_2, energia_2, magnetizacao_4;
@@ -28,8 +29,8 @@ int main(int argc, char** argv){
     double cumulante;
 
     // Variáveis para computação paralela
-    double m_temp_mpi;
-    double inicio_node, fim_node;
+    //double m_temp_mpi;
+    int inicio_node, fim_node;
 
     time_t inicio; // Variáveis para marcar o tempo de execução
 	time_t fim;
@@ -60,7 +61,6 @@ int main(int argc, char** argv){
 
     if (TERMALIZACAO == 0) {
         int id_registro = 0;
-        int res;
         char query_dados[2200];
             
         // Conexao com a base de dados
@@ -91,20 +91,26 @@ int main(int argc, char** argv){
         // Enviando a id da última quere para todas as unidades de processamento
         MPI_Bcast(&id_registro, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-        /*
-        // Cria um arquivo para armazenar os dados   
-        sprintf(nome_arquivo,"dados_%dx%dx%d_[%d]_[%d-%d-%d]-%d.dat", NX, NY, NZ, N_PASSOS, 
-                    VIZINHO_X, VIZINHO_Y, VIZINHO_Z, myrank);
-        FILE *arquivo_dados; 
-        arquivo_dados = fopen(nome_arquivo, "w");
-        */
+        int tamanho_array_temperaturas_medidas = 0;
+        tamanho_array_temperaturas_medidas = (TEMP_F-TEMP_I)/INCRE_TEMP;
 
+        float temperaturas_medidas[tamanho_array_temperaturas_medidas];
+
+        for(i = 0; i < tamanho_array_temperaturas_medidas; i++){
+            temperaturas_medidas[i] = TEMP_I + i*INCRE_TEMP;
+        }
+
+        inicio_node = myrank*(tamanho_array_temperaturas_medidas/nprocs);
+        fim_node = inicio_node + (tamanho_array_temperaturas_medidas/nprocs) - 1;
+        
+        /*
         // Divide a temperatura por unidade de processamento
         m_temp_mpi = (double) (TEMP_F*1.0 - TEMP_I*1.0)/(nprocs*1.0);
 
         // Estabelece temperaturas iniciais e finais para cada unidade de processamento
         inicio_node = TEMP_I + (myrank*1.0)*m_temp_mpi + INCRE_TEMP*(1.0);
         fim_node = inicio_node + m_temp_mpi; 
+        */
 
         // Definindo 10% do número total de passos para termalizar.
         passos_termalizacao = N_PASSOS*0.1;
@@ -113,14 +119,17 @@ int main(int argc, char** argv){
         fator_normalizacao = (unsigned long int) (N_PASSOS - N_PASSOS*0.1)*NX*NY*NZ;
 
         // É calculado as medidas para cada temperatura
-        for(temperatura=inicio_node; temperatura <= fim_node; temperatura+=INCRE_TEMP){
+        for(k=inicio_node; k <= fim_node; k++){
             
             // "Limpando" a variável query_dados
-            memset(&query_dados, "0", sizeof(query_dados));
+            memset(&query_dados, 0, sizeof(query_dados));
             
             // Cada unidade de processamento iniciará após um determinado tempo
             sleep((int) myrank + 1); 
             
+            // A temperatura que sera calculada
+            temperatura = temperaturas_medidas[k];
+
             iniciar_rede(); 
             
             // Zerando variáveis
@@ -153,7 +162,7 @@ int main(int argc, char** argv){
 
                 if(porcentagem_passos >= j) {
                     if (myrank == 0){   
-                        printf("%2.2f%% - %2.2f%%\n", (temperatura/(fim_node-inicio_node))*100, porcentagem_passos);
+                        printf("%2.2f%% - %2.2f%%\n", ( (temperatura-inicio_node)/(fim_node-inicio_node)*100, porcentagem_passos);
                         j++;
                     }   
                 }                    
@@ -208,10 +217,10 @@ int main(int argc, char** argv){
             
             // Inserindo dados de registro
             char query_registro_update[100];
-            sprintf(query_registro_update, "UPDATE registro SET duracao='%s' WHERE id=%d", difftime(fim, inicio), id_registro);
+            sprintf(query_registro_update, "UPDATE registro SET duracao=%f WHERE id=%d", difftime(fim, inicio), id_registro);
             mysql_query(&conexao, query_registro_update);
         }
-        
+
         MPI_Finalize(); // Finalizamos o MPI        
 
         mysql_close(&conexao);    

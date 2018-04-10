@@ -40,10 +40,3 @@ int vizinho_periodico(int x, int y, int z, int posicao);
 
 // Criando a rede
 int rede[NX][NY][NZ];
-
-// Gerador de numeros aleatórios Ranmar --------------
-double ranmar(void);
-void rmarin(int, int);
-
-static double u[97], c, cd, cm;
-int i97, j97;

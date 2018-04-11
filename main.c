@@ -68,10 +68,10 @@ int main(int argc, char** argv){
 
         float temperaturas_medidas[tamanho_array_temperaturas_medidas];
 
-        for(i = 0; i < tamanho_array_temperaturas_medidas; i++){
+        for(i = 0; i <= tamanho_array_temperaturas_medidas; i++){
             temperaturas_medidas[i] = TEMP_I + i*INCRE_TEMP;
         }
-        
+
         // Conexao com a base de dados
         MYSQL conexao;
         mysql_init(&conexao);
@@ -100,17 +100,8 @@ int main(int argc, char** argv){
         // Enviando a id da última quere para todas as unidades de processamento
         MPI_Bcast(&id_registro, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-        inicio_node = myrank*(tamanho_array_temperaturas_medidas/nprocs);
-        fim_node = inicio_node + (tamanho_array_temperaturas_medidas/nprocs) - 1;
-        
-        /*
-        // Divide a temperatura por unidade de processamento
-        m_temp_mpi = (double) (TEMP_F*1.0 - TEMP_I*1.0)/(nprocs*1.0);
-
-        // Estabelece temperaturas iniciais e finais para cada unidade de processamento
-        inicio_node = TEMP_I + (myrank*1.0)*m_temp_mpi + INCRE_TEMP*(1.0);
-        fim_node = inicio_node + m_temp_mpi; 
-        */
+        inicio_node = myrank*((tamanho_array_temperaturas_medidas+1)/nprocs);
+        fim_node = inicio_node + ((tamanho_array_temperaturas_medidas+1)/nprocs) - 1;
 
         // Definindo 10% do número total de passos para termalizar.
         passos_termalizacao = N_PASSOS*0.1;
@@ -119,8 +110,8 @@ int main(int argc, char** argv){
         fator_normalizacao = (unsigned long int) (N_PASSOS - N_PASSOS*0.1)*NX*NY*NZ;
 
         // É calculado as medidas para cada temperatura
-        for(k=inicio_node; k <= fim_node; k++){
-            
+        for(k = inicio_node; k <= fim_node; k++){
+                
             // "Limpando" a variável query_dados
             memset(&query_dados, 0, sizeof(query_dados));
             
@@ -128,7 +119,7 @@ int main(int argc, char** argv){
             sleep((int) myrank + 1); 
             
             // A temperatura que sera calculada
-            temperatura = temperaturas_medidas[k];
+            temperatura = (double) temperaturas_medidas[k];
             
             iniciar_rede(); 
             
@@ -162,7 +153,7 @@ int main(int argc, char** argv){
 
                 if(porcentagem_passos >= j) {
                     if (myrank == 0){   
-                        printf("%2.2f%% - %2.2f%%\n", ((k-inicio_node)/(fim_node-inicio_node))*100, porcentagem_passos);
+                        printf("[%d/%d] - %2.0f%%\n", k+1, fim_node-inicio_node+1, porcentagem_passos);
                         j++;
                     }   
                 }                    

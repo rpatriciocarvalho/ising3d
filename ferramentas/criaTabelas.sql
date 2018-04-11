@@ -24,5 +24,6 @@ nz int not null,
 cx int not null,
 cy int not null,
 duracao float not null,
-data_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+data_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+cz int not null
 );

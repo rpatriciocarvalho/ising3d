@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include <unistd.h>
-#include "mt19937ar.h"
 #include "funcoes.h"
 #include <mysql/mysql.h>
 #include <string.h>
@@ -39,7 +38,7 @@ int main(int argc, char** argv){
         
     // Iniciando o gerador de números aleatórios
     srand(time(NULL)); // Inicia semente
-    init_genrand((int) rand()%31328);
+    rmarin((int) rand()%31328, (int) rand()%30081); //inicia o ranmar
 
    /*
     Se "TERMALIZACAO" for diferente de zero, então
@@ -87,10 +86,11 @@ int main(int argc, char** argv){
         if (myrank == 0){
             // Inserindo dados de registro
             char query_registro[2000];
-            
+
             sprintf(query_registro, "INSERT INTO registro (n_proc, n_passos, temp_i, temp_f, temp_incr, nx, ny, nz, cx, cy, cz, duracao) "
                 "values(%d, %d, %f, %f, %f, %d, %d, %d, %d, %d, %d, 0)",  
-                nprocs, N_PASSOS, TEMP_I, TEMP_F, INCRE_TEMP, NX, NY, NZ, VIZINHO_X, VIZINHO_Y, VIZINHO_Z);
+                (int) nprocs, (int) N_PASSOS, (float) TEMP_I, (float) TEMP_F, (float) INCRE_TEMP, (int) NX, 
+                (int) NY, (int) NZ, (int) VIZINHO_X, (int) VIZINHO_Y, (int) VIZINHO_Z);
             mysql_query(&conexao, query_registro);
             
             // Capturando ID da última query
@@ -177,29 +177,8 @@ int main(int argc, char** argv){
                 "values(%d, %f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f, %2.20f)",  
                 id_registro, temperatura, magnetizacao, desvio_magnetizacao, energia, desvio_energia, calor_especifico, suscetibilidade_mag, cumulante);
             mysql_query(&conexao, query_dados);
-            
-            /*              
-                Escrevemos os dados em um arquivo.
-                
-                Será escrito no arquivo as seguintes colunas:
-                    Temperatura -  Magnetização média - desvio magnetização.
-                    energia média - desvio energia - calor específico 
-                    suscetibilidade magnética - cumulante de Binder
-            
-           
-            fprintf(arquivo_dados, "%f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f %2.20f\n", temperatura,
-                                        magnetizacao,
-                                        desvio_magnetizacao,
-                                        energia,
-                                        desvio_energia,
-                                        calor_especifico,
-                                        suscetibilidade_mag,
-                                        cumulante);
 
-            */
         }
-        
-        //fclose(arquivo_dados);
 
         if (myrank == 0){
             // Registra o momento que o processo termina e imprime na tela

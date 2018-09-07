@@ -28,13 +28,10 @@ void metropolis(float temperatura){
                                    vizinho(x,y,z,6, VIZINHO_Z);
                 
                 novo_spin = -1*rede[x][y][z];
-                delta_energia = -J*(novo_spin - rede[x][y][z])*soma_vizinhos;
+                delta_energia = -(J/(K_B*temperatura))*(novo_spin - rede[x][y][z])*soma_vizinhos;
 
-                if (delta_energia < 0){
+                if (delta_energia < 0 || log(ranmar()) < -delta_energia ){
                     rede[x][y][z] *= -1;
-                } else {
-                    exponencial = (double) pow(M_E, (double) (-delta_energia)/(K_B*temperatura));
-                    if(exponencial >ranmar()) rede[x][y][z] *= -1;
                 }
             }
         }

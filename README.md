@@ -1,7 +1,7 @@
 # ising3d
 Simulação do modelo de Ising 3D programado em C para computação paralela usando openMPI e base de dados MySQL.
 
-Trabalhamos com o método de Monte Carlo, algoritmo de Metropolis e o gerador de números aletórios [Mersenne Twister](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html).
+Trabalhamos com o método de Monte Carlo, algoritmo de Metropolis e o gerador de números aletórios ranmar.
 
 Há dois arquivos importantes na pasta `ferramentas`. O primeiro, `criaTabelas.sql` refere-se a criação das tabelas na base de dados MySQL (ou MariaDB) que irão armazenar os dados produzidos pela simulação. 
 

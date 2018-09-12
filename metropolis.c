@@ -13,8 +13,8 @@
 void metropolis(float temperatura){
 
     int x, y, z;
-    double exponencial;
-    int novo_spin, soma_vizinhos, delta_energia;
+    double delta_energia;
+    int novo_spin, soma_vizinhos;
 
     for(x = 0; x < NX; x++){
         for(y = 0; y < NY; y++){
